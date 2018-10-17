@@ -1,4 +1,4 @@
-#Import the objects.
+#Objects.
 {.push, header: "bls.hpp".}
 type
     PrivateKeyObject* {.importcpp: "bls::PrivateKey".} = object
@@ -6,8 +6,17 @@ type
     SignatureObject* {.importcpp: "bls::Signature".} = object
 {.pop.}
 
-#Define ref wrappers.
+#Refs.
 type
-    PrivateKey* = ref PrivateKeyObject
-    PublicKey* = ref PublicKeyObject
-    Signature* = ref SignatureObject
+    PrivateKeyRef* = ref PrivateKeyObject
+    PublicKeyRef* = ref PublicKeyObject
+    SignatureRef* = ref SignatureObject
+
+#Wrappers.
+type
+    PrivateKey* = object
+        data*: PrivateKeyRef
+    PublicKey* = object
+        data*: PublicKeyRef
+    Signature* = object
+        data*: SignatureRef
