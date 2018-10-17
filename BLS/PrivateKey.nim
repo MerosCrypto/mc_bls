@@ -27,6 +27,13 @@ proc `!=`(
     rhs: PrivateKeyObject
 ): bool {.importcpp: "# != #"}
 
+#Sign a message.
+proc sign(
+    key: PrivateKeyObject,
+    msg: ptr uint8,
+    len: uint
+): SignatureObject {.importcpp: "#.Sign(@)".}
+
 #Serialize.
 proc serialize(
     key: PrivateKeyObject,
@@ -42,7 +49,10 @@ proc newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
     #Extract the seed arg.
     var seed: string = seedArg
     #Create the Private Key.
-    result.data[] = privateKeyFromSeed(cast[ptr uint8](addr seed[0]), uint(seed.len))
+    result.data[] = privateKeyFromSeed(
+        cast[ptr uint8](addr seed[0]),
+        uint(seed.len)
+    )
 
 proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
     #Allocate the Private Key.
@@ -79,6 +89,19 @@ proc `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
 #Assignment operator.
 proc `=`*(lhs: var PrivateKey, rhs: PrivateKey) =
     lhs.data[] = rhs.data[]
+
+#Sign a message.
+proc sign*(key: PrivateKey, msgArg: string): Signature =
+    #Allocate the Signature.
+    result.data = SignatureRef()
+    #Extract the msg argument.
+    var msg: string = msgArg
+
+    #Create the Signature.
+    result.data[] = key.data[].sign(
+        cast[ptr uint8](addr msg[0]),
+        uint(msg.len)
+    )
 
 #Stringify a Private Key.
 proc toString*(key: PrivateKey): string =

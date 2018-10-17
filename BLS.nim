@@ -20,7 +20,9 @@ import BLS/Objects
 import BLS/PrivateKey
 import BLS/PublicKey
 import BLS/Signature
+import BLS/AggregationInfo
 
 #Export the public objects and tbe sublibraries.
-export Objects.PrivateKey, Objects.PublicKey, Objects.Signature
-export PrivateKey, PublicKey, Signature
+export Objects.PrivateKey, Objects.PublicKey
+export Objects.Signature, Objects.AggregationInfo
+export PrivateKey, PublicKey, Signature, AggregationInfo

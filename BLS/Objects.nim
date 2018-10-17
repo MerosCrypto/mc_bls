@@ -1,9 +1,10 @@
-#Objects.
+#C++ imports. The ones suffixed with "Object" have private constructors.
 {.push, header: "bls.hpp".}
 type
     PrivateKeyObject* {.importcpp: "bls::PrivateKey".} = object
     PublicKeyObject* {.importcpp: "bls::PublicKey".} = object
     SignatureObject* {.importcpp: "bls::Signature".} = object
+    AggregationInfo* {.importcpp: "bls::AggregationInfo".} = object
 {.pop.}
 
 #Refs.
@@ -12,7 +13,7 @@ type
     PublicKeyRef* = ref PublicKeyObject
     SignatureRef* = ref SignatureObject
 
-#Wrappers.
+#Wrappers. These are objects so we can overload `=`.
 type
     PrivateKey* = object
         data*: PrivateKeyRef
