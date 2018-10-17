@@ -3,9 +3,9 @@ when not defined(cpp):
     {.fatal: "The BLS lib requires C++.".}
 
 #Include the BLS headers.
-{.passC: "-Ichia/src/".}
-{.passC: "-Ichia/contrib/relic/include".}
-{.passC: "-Ichia/build/contrib/relic/include".}
+{.passC: "-IChia/src/".}
+{.passC: "-IChia/contrib/relic/include".}
+{.passC: "-IChia/build/contrib/relic/include".}
 
 #Link against BLS.
 {.passL: "-lbls".}
