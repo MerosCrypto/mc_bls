@@ -1,6 +1,9 @@
 #BLS Objects.
 import Objects
 
+#Vectors.
+import Vectors
+
 #String utils standard lib.
 import strutils
 
@@ -10,6 +13,10 @@ import strutils
 proc signatureFromBytes(
     bytes: ptr uint8
 ): SignatureObject {.importcpp: "bls::Signature::FromBytes(@)".}
+
+proc aggregateSignatures(
+    vec: SignatureVector
+): SignatureObject {.importcpp: "bls::Signature::AggregateSigs(@)".}
 
 #Equality operators
 proc `==`*(
@@ -66,6 +73,13 @@ proc newSignatureFromBytes*(keyArg: string): Signature =
     #Else, throw an error.
     else:
         raise newException(ValueError, "Invalid BLS Public Key length.")
+
+#Aggregate.
+proc aggregate*(sigs: seq[Signature]): Signature =
+    #Allocate the Signature.
+    result.data = SignatureRef()
+    #Aggregate the Signatures.
+    result.data[] = aggregateSignatures(sigs)
 
 #Set Aggregation Info.
 proc setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =

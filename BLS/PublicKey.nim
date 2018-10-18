@@ -1,6 +1,9 @@
 #BLS Objects.
 import Objects
 
+#Vectors.
+import Vectors
+
 #String utils standard lib.
 import strutils
 
@@ -14,6 +17,10 @@ proc publicKeyFromPrivateKey(
 proc publicKeyFromBytes(
     bytes: ptr uint8
 ): PublicKeyObject {.importcpp: "bls::PublicKey::FromBytes(@)".}
+
+proc aggregatePublicKeys(
+    vec: PublicKeyVector
+): PublicKeyObject {.importcpp: "bls::PublicKey::Aggregate(@)".}
 
 #Equality operators
 proc `==`(
@@ -65,6 +72,13 @@ proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
     #Else, throw an error.
     else:
         raise newException(ValueError, "Invalid BLS Public Key length.")
+
+#Aggregate.
+proc aggregate*(keys: seq[PublicKey]): PublicKey =
+    #Allocate the Public Key.
+    result.data = PublicKeyRef()
+    #Aggregate the Public Keys.
+    result.data[] = aggregatePublicKeys(keys)
 
 #Equality operators.
 proc `==`*(lhs: PublicKey, rhs: PublicKey): bool =
