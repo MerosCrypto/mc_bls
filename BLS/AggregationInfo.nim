@@ -1,6 +1,9 @@
 #BLS Objects.
 import Objects
 
+#Vectors.
+import Vectors
+
 #String utils standard lib.
 import strutils
 
@@ -16,6 +19,10 @@ proc aggregationInfoFromMsg(
 proc aggregationInfoFromSig(
     sig: SignatureObject
 ): ptr AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
+
+proc aggregateAggregationInfos(
+    vec: AggregationInfoVector
+): AggregationInfo {.importcpp: "bls::AggregationInfo::MergeInfos(@)".}
 
 proc `==`*(
     lhs: AggregationInfo,
@@ -38,6 +45,10 @@ proc newAggregationInfoFromMsg*(
         cast[ptr uint8](addr msg[0]),
         uint(msg.len)
     )
+
+#Aggregate.
+proc aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
+    aggregateAggregationInfos(agInfos)
 
 proc getAggregationInfo*(
     sig: Signature
