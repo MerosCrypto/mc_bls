@@ -13,6 +13,15 @@ proc aggregationInfoFromMsg(
     len: uint
 ): AggregationInfo {.importcpp: "bls::AggregationInfo::FromMsg(@)".}
 
+proc aggregationInfoFromSig(
+    sig: SignatureObject
+): ptr AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
+
+proc `==`*(
+    lhs: AggregationInfo,
+    rhs: AggregationInfo
+): bool {.importcpp: "# == #".}
+
 {.pop.}
 
 #Constructor.
@@ -30,6 +39,7 @@ proc newAggregationInfoFromMsg*(
         uint(msg.len)
     )
 
-#Assignment operator.
-proc `=`*(lhs: var AggregationInfo, rhs: AggregationInfo) =
-    lhs = rhs
+proc getAggregationInfo*(
+    sig: Signature
+): AggregationInfo =
+    aggregationInfoFromSig(sig.data[])[]

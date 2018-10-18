@@ -4,7 +4,7 @@ import ../BLS
 var
     #Create the key pair.
     priv: PrivateKey = newPrivateKeyFromSeed("seed")
-    pub: PublicKey = priv.getPublicKey
+    pub: PublicKey = priv.getPublicKey()
     #Define the message.
     msg: string = "message"
     #Sign the message.
@@ -18,4 +18,6 @@ var
 sig2.setAggregationInfo(agInfo)
 
 #Test the signature.
+assert(sig1.getAggregationInfo() == sig2.getAggregationInfo())
+assert(sig1.toString() == sig2.toString())
 assert(sig2.verify())
