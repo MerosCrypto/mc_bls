@@ -19,12 +19,12 @@ proc aggregateSignatures(
 ): SignatureObject {.importcpp: "bls::Signature::AggregateSigs(@)".}
 
 #Equality operators
-proc `==`*(
+proc `==`(
     lhs: SignatureObject,
     rhs: SignatureObject
 ): bool {.importcpp: "# == #"}
 
-proc `!=`*(
+proc `!=`(
     lhs: SignatureObject,
     rhs: SignatureObject
 ): bool {.importcpp: "# != #"}
@@ -102,7 +102,7 @@ proc toString*(key: Signature): string =
     #Serialize the key into the string.
     key[].serialize(cast[ptr uint8](addr result[0]))
 
-#Stringify a Public Key for printing.
+#Stringify a Signature for printing.
 proc `$`*(key: Signature): string =
     #Create the result string.
     result = ""
