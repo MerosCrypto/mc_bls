@@ -1,5 +1,5 @@
 #BLS lib.
-import ../BLS
+import ../ec_bls
 
 var
     #Define the Keys.

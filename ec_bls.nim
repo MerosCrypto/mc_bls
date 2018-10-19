@@ -3,7 +3,7 @@ when not defined(cpp):
     {.fatal: "The BLS lib requires C++.".}
 
 #Include the BLS headers.
-const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 8)
+const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 11)
 {.passC: "-I" & currentFolder & "Chia/src/".}
 {.passC: "-I" & currentFolder & "Chia/contrib/relic/include".}
 {.passC: "-I" & currentFolder & "Chia/build/contrib/relic/include".}
@@ -17,11 +17,11 @@ if not init():
     raise newException(Exception, "Couldn't init the BLS lib.")
 
 #Import each of the BLS files.
-import BLS/Objects
-import BLS/PrivateKey
-import BLS/PublicKey
-import BLS/Signature
-import BLS/AggregationInfo
+import ec_bls/Objects
+import ec_bls/PrivateKey
+import ec_bls/PublicKey
+import ec_bls/Signature
+import ec_bls/AggregationInfo
 
 #Export the public objects and tbe sublibraries.
 export Objects.PrivateKey, Objects.PublicKey
