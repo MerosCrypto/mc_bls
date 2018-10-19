@@ -3,9 +3,10 @@ when not defined(cpp):
     {.fatal: "The BLS lib requires C++.".}
 
 #Include the BLS headers.
-{.passC: "-IChia/src/".}
-{.passC: "-IChia/contrib/relic/include".}
-{.passC: "-IChia/build/contrib/relic/include".}
+const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 8)
+{.passC: "-I" & currentFolder & "Chia/src/".}
+{.passC: "-I" & currentFolder & "Chia/contrib/relic/include".}
+{.passC: "-I" & currentFolder & "Chia/build/contrib/relic/include".}
 
 #Link against BLS.
 {.passL: "-lbls".}
