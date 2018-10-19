@@ -45,25 +45,25 @@ proc serialize(
 #Constructors.
 proc newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
     #Allocate the Private Key.
-    result.data = PrivateKeyRef()
+    result = (Objects.PrivateKey)()
     #Extract the seed arg.
     var seed: string = seedArg
     #Create the Private Key.
-    result.data[] = privateKeyFromSeed(
+    result[] = privateKeyFromSeed(
         cast[ptr uint8](addr seed[0]),
         uint(seed.len)
     )
 
 proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
     #Allocate the Private Key.
-    result.data = PrivateKeyRef()
+    result = (Objects.PrivateKey)()
 
     #If a binary string was passed in...
     if keyArg.len == 32:
         #Extract the argument.
         var key: string = keyArg
         #Create the Private Key.
-        result.data[] = privateKeyFromBytes(cast[ptr uint8](addr key[0]))
+        result[] = privateKeyFromBytes(cast[ptr uint8](addr key[0]))
 
     #If a hex string was passed in...
     elif keyArg.len == 64:
@@ -73,7 +73,7 @@ proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
         for b in countup(0, 63, 2):
             key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
         #Create the Private Key.
-        result.data[] = privateKeyFromBytes(addr key[0])
+        result[] = privateKeyFromBytes(addr key[0])
 
     #Else, throw an error.
     else:
@@ -81,24 +81,20 @@ proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
 
 #Equality operators.
 proc `==`*(lhs: PrivateKey, rhs: PrivateKey): bool =
-    lhs.data[] == rhs.data[]
+    lhs[] == rhs[]
 
 proc `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
-    lhs.data[] != rhs.data[]
-
-#Assignment operator.
-proc `=`*(lhs: var PrivateKey, rhs: PrivateKey) =
-    lhs.data[] = rhs.data[]
+    lhs[] != rhs[]
 
 #Sign a message.
 proc sign*(key: PrivateKey, msgArg: string): Signature =
     #Allocate the Signature.
-    result.data = SignatureRef()
+    result = Signature()
     #Extract the msg argument.
     var msg: string = msgArg
 
     #Create the Signature.
-    result.data[] = key.data[].sign(
+    result[] = key[].sign(
         cast[ptr uint8](addr msg[0]),
         uint(msg.len)
     )
@@ -108,7 +104,7 @@ proc toString*(key: PrivateKey): string =
     #Create the result string.
     result = newString(32)
     #Serialize the key into the string.
-    key.data[].serialize(cast[ptr uint8](addr result[0]))
+    key[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Private Key for printing.
 proc `$`*(key: PrivateKey): string =

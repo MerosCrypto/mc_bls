@@ -51,14 +51,14 @@ proc serialize(
 #Constructor.
 proc newSignatureFromBytes*(keyArg: string): Signature =
     #Allocate the Signature.
-    result.data = SignatureRef()
+    result = (Objects.Signature)()
 
     #If a binary string was passed in...
     if keyArg.len == 96:
         #Extract the argument.
         var key: string = keyArg
         #Create the Public Key.
-        result.data[] = signatureFromBytes(cast[ptr uint8](addr key[0]))
+        result[] = signatureFromBytes(cast[ptr uint8](addr key[0]))
 
     #If a hex string was passed in...
     elif keyArg.len == 192:
@@ -68,7 +68,7 @@ proc newSignatureFromBytes*(keyArg: string): Signature =
         for b in countup(0, 191, 2):
             key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
         #Create the Public Key.
-        result.data[] = signatureFromBytes(addr key[0])
+        result[] = signatureFromBytes(addr key[0])
 
     #Else, throw an error.
     else:
@@ -77,24 +77,30 @@ proc newSignatureFromBytes*(keyArg: string): Signature =
 #Aggregate.
 proc aggregate*(sigs: seq[Signature]): Signature =
     #Allocate the Signature.
-    result.data = SignatureRef()
+    result = (Objects.Signature)()
     #Aggregate the Signatures.
-    result.data[] = aggregateSignatures(sigs)
+    result[] = aggregateSignatures(sigs)
 
 #Set Aggregation Info.
 proc setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
-    sig.data[].cSetAggregationInfo(agInfo)
+    sig[].cSetAggregationInfo(agInfo)
+
+proc `==`*(lhs: Signature, rhs: Signature): bool =
+    lhs[] == rhs[]
+
+proc `!=`*(lhs: Signature, rhs: Signature): bool =
+    lhs[] != rhs[]
 
 #Verify.
 proc verify*(sig: Signature): bool =
-    sig.data[].cVerify()
+    sig[].cVerify()
 
 #Stringify a Public Key.
 proc toString*(key: Signature): string =
     #Create the result string.
     result = newString(96)
     #Serialize the key into the string.
-    key.data[].serialize(cast[ptr uint8](addr result[0]))
+    key[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Public Key for printing.
 proc `$`*(key: Signature): string =

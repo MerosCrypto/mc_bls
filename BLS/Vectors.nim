@@ -42,7 +42,7 @@ proc add(
 converter toVector*(keys: seq[PublicKey]): PublicKeyVector =
     result = newPublicKeyVector()
     for i in 0 ..< keys.len:
-        result.add(keys[i].data[])
+        result.add(keys[i][])
 
 converter toVector*(agInfos: seq[AggregationInfo]): AggregationInfoVector =
     result = newAggregationInfoVector()
@@ -52,4 +52,4 @@ converter toVector*(agInfos: seq[AggregationInfo]): AggregationInfoVector =
 converter toVector*(sigs: seq[Signature]): SignatureVector =
     result = newSignatureVector()
     for i in 0 ..< sigs.len:
-        result.add(sigs[i].data[])
+        result.add(sigs[i][])

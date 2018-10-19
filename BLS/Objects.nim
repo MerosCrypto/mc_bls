@@ -7,17 +7,8 @@ type
     AggregationInfo* {.importcpp: "bls::AggregationInfo".} = object
 {.pop.}
 
-#Refs.
+#Wrappers.
 type
-    PrivateKeyRef* = ref PrivateKeyObject
-    PublicKeyRef* = ref PublicKeyObject
-    SignatureRef* = ref SignatureObject
-
-#Wrappers. These are objects so we can overload `=`.
-type
-    PrivateKey* = object
-        data*: PrivateKeyRef
-    PublicKey* = object
-        data*: PublicKeyRef
-    Signature* = object
-        data*: SignatureRef
+    PrivateKey* = ref PrivateKeyObject
+    PublicKey* = ref PublicKeyObject
+    Signature* = ref SignatureObject

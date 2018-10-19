@@ -44,20 +44,20 @@ proc serialize(
 #Constructors.
 proc getPublicKey*(key: PrivateKey): PublicKey =
     #Allocate the Public Key.
-    result.data = PublicKeyRef()
+    result = (Objects.PublicKey)()
     #Create the Public Key.
-    result.data[] = publicKeyFromPrivateKey(key.data[])
+    result[] = publicKeyFromPrivateKey(key[])
 
 proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
     #Allocate the Public Key.
-    result.data = PublicKeyRef()
+    result = (Objects.PublicKey)()
 
     #If a binary string was passed in...
     if keyArg.len == 48:
         #Extract the argument.
         var key: string = keyArg
         #Create the Public Key.
-        result.data[] = publicKeyFromBytes(cast[ptr uint8](addr key[0]))
+        result[] = publicKeyFromBytes(cast[ptr uint8](addr key[0]))
 
     #If a hex string was passed in...
     elif keyArg.len == 96:
@@ -67,7 +67,7 @@ proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
         for b in countup(0, 95, 2):
             key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
         #Create the Public Key.
-        result.data[] = publicKeyFromBytes(addr key[0])
+        result[] = publicKeyFromBytes(addr key[0])
 
     #Else, throw an error.
     else:
@@ -76,27 +76,24 @@ proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
 #Aggregate.
 proc aggregate*(keys: seq[PublicKey]): PublicKey =
     #Allocate the Public Key.
-    result.data = PublicKeyRef()
+    result = (Objects.PublicKey)()
     #Aggregate the Public Keys.
-    result.data[] = aggregatePublicKeys(keys)
+    result[] = aggregatePublicKeys(keys)
 
 #Equality operators.
 proc `==`*(lhs: PublicKey, rhs: PublicKey): bool =
-    lhs.data[] == rhs.data[]
+    lhs[] == rhs[]
 
 proc `!=`*(lhs: PublicKey, rhs: PublicKey): bool =
-    lhs.data[] != rhs.data[]
-
-#Assignment operator.
-proc `=`*(lhs: var PublicKey, rhs: PublicKey) =
-    lhs.data[] = rhs.data[]
+    lhs[] != rhs[]
 
 #Stringify a Public Key.
 proc toString*(key: PublicKey): string =
     #Create the result string.
     result = newString(48)
+
     #Serialize the key into the string.
-    key.data[].serialize(cast[ptr uint8](addr result[0]))
+    key[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Public Key for printing.
 proc `$`*(key: PublicKey): string =

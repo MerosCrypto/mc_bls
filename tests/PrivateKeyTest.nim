@@ -6,7 +6,7 @@ var
     #Seeds.
     seed1: string = "1"
     seed2: string = "2"
-    
+
     #Private Keys.
     #From seed.
     privKey1: PrivateKey = newPrivateKeyFromSeed(seed1)
@@ -28,5 +28,3 @@ assert(privKey3 != privKey4)
 privKey4 = privKey3
 #Check their values.
 assert(privKey3 == privKey4)
-#Make sure it didn't just copy the ref value but the actual value.
-assert(cast[int](privKey3.data) != cast[int](privKey4.data))

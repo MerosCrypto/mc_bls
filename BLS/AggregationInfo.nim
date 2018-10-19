@@ -41,7 +41,7 @@ proc newAggregationInfoFromMsg*(
 
     #Create the AggregationInfo.
     result = aggregationInfoFromMsg(
-        key.data[],
+        key[],
         cast[ptr uint8](addr msg[0]),
         uint(msg.len)
     )
@@ -53,4 +53,4 @@ proc aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
 proc getAggregationInfo*(
     sig: Signature
 ): AggregationInfo =
-    aggregationInfoFromSig(sig.data[])[]
+    aggregationInfoFromSig(sig[])[]

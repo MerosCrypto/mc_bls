@@ -27,5 +27,3 @@ assert(pubKey3 != pubKey4)
 pubKey4 = pubKey3
 #Check their values.
 assert(pubKey3 == pubKey4)
-#Make sure it didn't just copy the ref value but the actual value.
-assert(cast[int](pubKey3.data) != cast[int](pubKey4.data))
