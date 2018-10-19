@@ -10,31 +10,31 @@ import strutils
 {.push, header: "bls.hpp".}
 
 #Constructors.
-proc publicKeyFromPrivateKey(
+func publicKeyFromPrivateKey(
     key: PrivateKeyObject
 ): PublicKeyObject {.importcpp: "#.GetPublicKey()".}
 
-proc publicKeyFromBytes(
+func publicKeyFromBytes(
     bytes: ptr uint8
 ): PublicKeyObject {.importcpp: "bls::PublicKey::FromBytes(@)".}
 
-proc aggregatePublicKeys(
+func aggregatePublicKeys(
     vec: PublicKeyVector
 ): PublicKeyObject {.importcpp: "bls::PublicKey::Aggregate(@)".}
 
 #Equality operators
-proc `==`(
+func `==`(
     lhs: PublicKeyObject,
     rhs: PublicKeyObject
 ): bool {.importcpp: "# == #"}
 
-proc `!=`(
+func `!=`(
     lhs: PublicKeyObject,
     rhs: PublicKeyObject
 ): bool {.importcpp: "# != #"}
 
 #Serialize.
-proc serialize(
+func serialize(
     key: PublicKeyObject,
     buffer: ptr uint8
 ) {.importcpp: "#.Serialize(@)".}
@@ -42,13 +42,13 @@ proc serialize(
 {.pop.}
 
 #Constructors.
-proc getPublicKey*(key: PrivateKey): PublicKey =
+func getPublicKey*(key: PrivateKey): PublicKey =
     #Allocate the Public Key.
     result = (Objects.PublicKey)()
     #Create the Public Key.
     result[] = publicKeyFromPrivateKey(key[])
 
-proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
+func newPublicKeyFromBytes*(keyArg: string): PublicKey =
     #Allocate the Public Key.
     result = (Objects.PublicKey)()
 
@@ -74,21 +74,21 @@ proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
         raise newException(ValueError, "Invalid BLS Public Key length.")
 
 #Aggregate.
-proc aggregate*(keys: seq[PublicKey]): PublicKey =
+func aggregate*(keys: seq[PublicKey]): PublicKey =
     #Allocate the Public Key.
     result = (Objects.PublicKey)()
     #Aggregate the Public Keys.
     result[] = aggregatePublicKeys(keys)
 
 #Equality operators.
-proc `==`*(lhs: PublicKey, rhs: PublicKey): bool =
+func `==`*(lhs: PublicKey, rhs: PublicKey): bool =
     lhs[] == rhs[]
 
-proc `!=`*(lhs: PublicKey, rhs: PublicKey): bool =
+func `!=`*(lhs: PublicKey, rhs: PublicKey): bool =
     lhs[] != rhs[]
 
 #Stringify a Public Key.
-proc toString*(key: PublicKey): string =
+func toString*(key: PublicKey): string =
     #Create the result string.
     result = newString(48)
 
@@ -96,7 +96,7 @@ proc toString*(key: PublicKey): string =
     key[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Public Key for printing.
-proc `$`*(key: PublicKey): string =
+func `$`*(key: PublicKey): string =
     #Create the result string.
     result = ""
 

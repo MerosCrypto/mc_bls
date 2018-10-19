@@ -7,35 +7,35 @@ import strutils
 {.push, header: "bls.hpp".}
 
 #Constructors.
-proc privateKeyFromSeed(
+func privateKeyFromSeed(
     bytes: ptr uint8,
     size: uint
 ): PrivateKeyObject {.importcpp: "bls::PrivateKey::FromSeed(@)".}
 
-proc privateKeyFromBytes(
+func privateKeyFromBytes(
     bytes: ptr uint8
 ): PrivateKeyObject {.importcpp: "bls::PrivateKey::FromBytes(@)".}
 
 #Equality operators
-proc `==`(
+func `==`(
     lhs: PrivateKeyObject,
     rhs: PrivateKeyObject
 ): bool {.importcpp: "# == #"}
 
-proc `!=`(
+func `!=`(
     lhs: PrivateKeyObject,
     rhs: PrivateKeyObject
 ): bool {.importcpp: "# != #"}
 
 #Sign a message.
-proc sign(
+func sign(
     key: PrivateKeyObject,
     msg: ptr uint8,
     len: uint
 ): SignatureObject {.importcpp: "#.Sign(@)".}
 
 #Serialize.
-proc serialize(
+func serialize(
     key: PrivateKeyObject,
     buffer: ptr uint8
 ) {.importcpp: "#.Serialize(@)".}
@@ -43,7 +43,7 @@ proc serialize(
 {.pop.}
 
 #Constructors.
-proc newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
+func newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
     #Allocate the Private Key.
     result = (Objects.PrivateKey)()
     #Extract the seed arg.
@@ -54,7 +54,7 @@ proc newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
         uint(seed.len)
     )
 
-proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
+func newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
     #Allocate the Private Key.
     result = (Objects.PrivateKey)()
 
@@ -80,14 +80,14 @@ proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
         raise newException(ValueError, "Invalid BLS Private Key length.")
 
 #Equality operators.
-proc `==`*(lhs: PrivateKey, rhs: PrivateKey): bool =
+func `==`*(lhs: PrivateKey, rhs: PrivateKey): bool =
     lhs[] == rhs[]
 
-proc `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
+func `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
     lhs[] != rhs[]
 
 #Sign a message.
-proc sign*(key: PrivateKey, msgArg: string): Signature =
+func sign*(key: PrivateKey, msgArg: string): Signature =
     #Allocate the Signature.
     result = Signature()
     #Extract the msg argument.
@@ -100,14 +100,14 @@ proc sign*(key: PrivateKey, msgArg: string): Signature =
     )
 
 #Stringify a Private Key.
-proc toString*(key: PrivateKey): string =
+func toString*(key: PrivateKey): string =
     #Create the result string.
     result = newString(32)
     #Serialize the key into the string.
     key[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Private Key for printing.
-proc `$`*(key: PrivateKey): string =
+func `$`*(key: PrivateKey): string =
     #Create the result string.
     result = ""
 

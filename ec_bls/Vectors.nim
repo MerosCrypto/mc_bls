@@ -7,32 +7,32 @@ type
     AggregationInfoVector* {.importcpp: "std::vector<bls::AggregationInfo>".} = object
     SignatureVector* {.importcpp: "std::vector<bls::Signature>"} = object
 
-proc newPublicKeyVector(): PublicKeyVector {.
+func newPublicKeyVector(): PublicKeyVector {.
     importcpp: "std::vector<bls::PublicKey>",
     constructor
 .}
 
-proc newAggregationInfoVector(): AggregationInfoVector {.
+func newAggregationInfoVector(): AggregationInfoVector {.
     importcpp: "std::vector<bls::AggregationInfo>",
     constructor
 .}
 
-proc newSignatureVector(): SignatureVector {.
+func newSignatureVector(): SignatureVector {.
     importcpp: "std::vector<bls::Signature>",
     constructor
 .}
 
-proc add(
+func add(
     vector: PublicKeyVector,
     key: PublicKeyObject
 ) {.importcpp: "#.push_back(@)"}
 
-proc add(
+func add(
     vector: AggregationInfoVector,
     agInfo: AggregationInfo
 ) {.importcpp: "#.push_back(@)"}
 
-proc add(
+func add(
     vector: SignatureVector,
     key: SignatureObject
 ) {.importcpp: "#.push_back(@)"}

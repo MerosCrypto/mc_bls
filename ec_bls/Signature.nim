@@ -10,105 +10,105 @@ import strutils
 {.push, header: "bls.hpp".}
 
 #Constructor.
-proc signatureFromBytes(
+func signatureFromBytes(
     bytes: ptr uint8
 ): SignatureObject {.importcpp: "bls::Signature::FromBytes(@)".}
 
-proc aggregateSignatures(
+func aggregateSignatures(
     vec: SignatureVector
 ): SignatureObject {.importcpp: "bls::Signature::AggregateSigs(@)".}
 
 #Equality operators
-proc `==`(
+func `==`(
     lhs: SignatureObject,
     rhs: SignatureObject
 ): bool {.importcpp: "# == #"}
 
-proc `!=`(
+func `!=`(
     lhs: SignatureObject,
     rhs: SignatureObject
 ): bool {.importcpp: "# != #"}
 
 #Set Aggregation Info.
-proc cSetAggregationInfo(
+func cSetAggregationInfo(
     sig: SignatureObject,
     agInfo: AggregationInfo
 ) {.importcpp: "#.SetAggregationInfo(@)".}
 
 #Verify.
-proc cVerify(
+func cVerify(
     sig: SignatureObject
 ): bool {.importcpp: "#.Verify()".}
 
 #Serialize.
-proc serialize(
-    key: SignatureObject,
+func serialize(
+    sig: SignatureObject,
     buffer: ptr uint8
 ) {.importcpp: "#.Serialize(@)".}
 
 {.pop.}
 
 #Constructor.
-proc newSignatureFromBytes*(keyArg: string): Signature =
+func newSignatureFromBytes*(sigArg: string): Signature =
     #Allocate the Signature.
     result = (Objects.Signature)()
 
     #If a binary string was passed in...
-    if keyArg.len == 96:
+    if sigArg.len == 96:
         #Extract the argument.
-        var key: string = keyArg
-        #Create the Public Key.
-        result[] = signatureFromBytes(cast[ptr uint8](addr key[0]))
+        var sig: string = sigArg
+        #Create the Signature.
+        result[] = signatureFromBytes(cast[ptr uint8](addr sig[0]))
 
     #If a hex string was passed in...
-    elif keyArg.len == 192:
-        #Define a array for the key.
-        var key: array[96, uint8]
+    elif sigArg.len == 192:
+        #Define a array for the sig.
+        var sig: array[96, uint8]
         #Parse the hex string.
         for b in countup(0, 191, 2):
-            key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
-        #Create the Public Key.
-        result[] = signatureFromBytes(addr key[0])
+            sig[b div 2] = uint8(parseHexInt(sigArg[b .. b + 1]))
+        #Create the Signature.
+        result[] = signatureFromBytes(addr sig[0])
 
     #Else, throw an error.
     else:
-        raise newException(ValueError, "Invalid BLS Public Key length.")
+        raise newException(ValueError, "Invalid BLS Public sig length.")
 
 #Aggregate.
-proc aggregate*(sigs: seq[Signature]): Signature =
+func aggregate*(sigs: seq[Signature]): Signature =
     #Allocate the Signature.
     result = (Objects.Signature)()
     #Aggregate the Signatures.
     result[] = aggregateSignatures(sigs)
 
 #Set Aggregation Info.
-proc setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
+func setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
     sig[].cSetAggregationInfo(agInfo)
 
-proc `==`*(lhs: Signature, rhs: Signature): bool =
+func `==`*(lhs: Signature, rhs: Signature): bool =
     lhs[] == rhs[]
 
-proc `!=`*(lhs: Signature, rhs: Signature): bool =
+func `!=`*(lhs: Signature, rhs: Signature): bool =
     lhs[] != rhs[]
 
 #Verify.
-proc verify*(sig: Signature): bool =
+func verify*(sig: Signature): bool =
     sig[].cVerify()
 
-#Stringify a Public Key.
-proc toString*(key: Signature): string =
+#Stringify a Signature.
+func toString*(sig: Signature): string =
     #Create the result string.
     result = newString(96)
-    #Serialize the key into the string.
-    key[].serialize(cast[ptr uint8](addr result[0]))
+    #Serialize the sig into the string.
+    sig[].serialize(cast[ptr uint8](addr result[0]))
 
 #Stringify a Signature for printing.
-proc `$`*(key: Signature): string =
+func `$`*(sig: Signature): string =
     #Create the result string.
     result = ""
 
     #Get the binary version of the string.
-    var serialized: string = key.toString()
+    var serialized: string = sig.toString()
 
     #Format the serialized string into a hex string.
     for i in serialized:

@@ -10,21 +10,21 @@ import strutils
 {.push, header: "bls.hpp".}
 
 #Constructor.
-proc aggregationInfoFromMsg(
+func aggregationInfoFromMsg(
     key: PublicKeyObject,
     msg: ptr uint8,
     len: uint
 ): AggregationInfo {.importcpp: "bls::AggregationInfo::FromMsg(@)".}
 
-proc aggregationInfoFromSig(
+func aggregationInfoFromSig(
     sig: SignatureObject
 ): ptr AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
 
-proc aggregateAggregationInfos(
+func aggregateAggregationInfos(
     vec: AggregationInfoVector
 ): AggregationInfo {.importcpp: "bls::AggregationInfo::MergeInfos(@)".}
 
-proc `==`*(
+func `==`*(
     lhs: AggregationInfo,
     rhs: AggregationInfo
 ): bool {.importcpp: "# == #".}
@@ -32,7 +32,7 @@ proc `==`*(
 {.pop.}
 
 #Constructor.
-proc newAggregationInfoFromMsg*(
+func newAggregationInfoFromMsg*(
     key: PublicKey,
     msgArg: string
 ): AggregationInfo =
@@ -47,10 +47,10 @@ proc newAggregationInfoFromMsg*(
     )
 
 #Aggregate.
-proc aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
+func aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
     aggregateAggregationInfos(agInfos)
 
-proc getAggregationInfo*(
+func getAggregationInfo*(
     sig: Signature
 ): AggregationInfo =
     aggregationInfoFromSig(sig[])[]
