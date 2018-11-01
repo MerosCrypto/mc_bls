@@ -4,6 +4,7 @@ when not defined(cpp):
 
 #Include the BLS headers.
 const currentFolder = currentSourcePath().substr(0, currentSourcePath().len - 11)
+{.passC: "--std=c++11".}
 {.passC: "-I" & currentFolder & "Chia/src/".}
 {.passC: "-I" & currentFolder & "Chia/contrib/relic/include".}
 {.passC: "-I" & currentFolder & "Chia/build/contrib/relic/include".}
