@@ -5,8 +5,17 @@ A Nim Wrapper for [Chia's BLS Library](https://github.com/chia-network/bls-signa
 
 # Installation
 
-1) Run `nimble install`.
-2) Apply the following diff to Chia's library:
+1) Download all the needed files.
+```
+nimble install https://github.com/EmberCrypto/ec_bls/
+
+git clone https://github.com/chia-network/bls-signatures
+cd bls-signatures
+git checkout f37e5bb0901a14a45c3d3195cc49029cff340bc2
+git submodule update --init --recursive
+```
+
+2) Add `tree = AggregationInfo::AggregationTree();` after line 247, but before line 248, to `src/aggregationinfo.cpp`. To be more exact, here is a diff file.
 ```
 diff --git a/src/aggregationinfo.cpp b/src/aggregationinfo.cpp
 index 0cefddd..690ceed 100644
@@ -21,6 +30,16 @@ index 0cefddd..690ceed 100644
      SortIntoVectors(sortedMessageHashes, sortedPubKeys, tree);
      return *this;
  ```
-3) Build the Chia library on your system. For instructions on how to, see their README.
-4) Place only the generated `build/` folder inside this package's `Chia/` folder.
-5) Move `libbls.a` out of your `build/` folder and install it on your system.
+ 
+3) Build Chia's BLS library.
+```
+mkdir build
+cd build
+cmake ../
+cmake --build . -- -j 6
+```
+If there's a complaint about `Python.h`, you can install it on Debian based systems via the `python-dev` package.
+
+4) Place the generated `build/` folder (which you are in) inside the Nimble package's `Chia/` folder. The Nimble package can be found in `~/.nimble/pkgs` (on Linux and Mac OS) or in `C:\Users\USERNAME\.nimble\pkgs`.
+
+5) Either add `build/` to your linker's search paths or install it on your system. On Linux (and maybe Mac OS), you can install it on the system via `/lib`, `/lib64`, `/usr/lib`, and/or `/usr/local/lib`. On Windows, your compiler may have a special folder.
