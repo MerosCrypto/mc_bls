@@ -40,6 +40,6 @@ cmake --build . -- -j 6
 ```
 If there's a complaint about `Python.h`, you can install it on Debian based systems via the `python-dev` package.
 
-4) Place the generated `build/` folder (which you are in) inside the Nimble package's `Chia/` folder. The Nimble package can be found in `~/.nimble/pkgs` (on Linux and Mac OS) or in `C:\Users\USERNAME\.nimble\pkgs`.
+4) Place the generated `build/` folder (which you are in) inside the Nimble package's `Chia/` folder. The Nimble package can be found in `~/.nimble/pkgs` (on Linux and Mac OS) or in `C:\Users\USERNAME\.nimble\pkgs` (on Windows).
 
-5) Either add `build/` to your linker's search paths or install it on your system. On Linux (and maybe Mac OS), you can install it on the system via `/lib`, `/lib64`, `/usr/lib`, and/or `/usr/local/lib`. On Windows, your compiler may have a special folder.
+5) Either add `build/` to your linker's search paths or install `build/libbls.a` on your system. On Linux (and maybe Mac OS), you can install it on your system via `/lib`, `/lib64`, `/usr/lib`, and/or `/usr/local/lib`. On Windows, your compiler may have a special folder.
