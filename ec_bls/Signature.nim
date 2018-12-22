@@ -50,6 +50,26 @@ func serialize(
 
 #Constructor.
 func newSignatureFromBytes*(sigArg: string): Signature =
+    #Check this isn't a null sig.
+    var broke: bool = false
+    if sigArg.len == 96:
+        for b in sigArg:
+            if ord(b) != 0:
+                broke = true
+                break
+        if not broke:
+            return nil
+    elif sigArg.len == 192:
+        for b in sigArg:
+            if b != '0':
+                broke = true
+                break
+        if not broke:
+            return nil
+    #Else, throw an error.
+    else:
+        raise newException(ValueError, "Invalid BLS Public sig length.")
+
     #Allocate the Signature.
     result = (Objects.Signature)()
 
@@ -69,10 +89,6 @@ func newSignatureFromBytes*(sigArg: string): Signature =
             sig[b div 2] = uint8(parseHexInt(sigArg[b .. b + 1]))
         #Create the Signature.
         result[] = signatureFromBytes(addr sig[0])
-
-    #Else, throw an error.
-    else:
-        raise newException(ValueError, "Invalid BLS Public sig length.")
 
 #Aggregate.
 func aggregate*(sigs: seq[Signature]): Signature =

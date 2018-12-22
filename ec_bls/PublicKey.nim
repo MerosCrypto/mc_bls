@@ -49,6 +49,26 @@ func getPublicKey*(key: PrivateKey): PublicKey =
     result[] = publicKeyFromPrivateKey(key[])
 
 func newPublicKeyFromBytes*(keyArg: string): PublicKey =
+    #Check this isn't a null key.
+    var broke: bool = false
+    if keyArg.len == 48:
+        for b in keyArg:
+            if ord(b) != 0:
+                broke = true
+                break
+        if not broke:
+            return nil
+    elif keyArg.len == 96:
+        for b in keyArg:
+            if b != '0':
+                broke = true
+                break
+        if not broke:
+            return nil
+    #Else, throw an error.
+    else:
+        raise newException(ValueError, "Invalid BLS Public Key length.")
+
     #Allocate the Public Key.
     result = (Objects.PublicKey)()
 
@@ -68,10 +88,6 @@ func newPublicKeyFromBytes*(keyArg: string): PublicKey =
             key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
         #Create the Public Key.
         result[] = publicKeyFromBytes(addr key[0])
-
-    #Else, throw an error.
-    else:
-        raise newException(ValueError, "Invalid BLS Public Key length.")
 
 #Aggregate.
 func aggregate*(keys: seq[PublicKey]): PublicKey =

@@ -27,4 +27,7 @@ assert(sig2.verify())
 #Test null signatures.
 assert(sigNil == sigNil)
 assert(sigNil != sig1)
+
 assert(sigNil.toString() == newString(96))
+assert(newSignatureFromBytes(sigNil.toString()) == nil)
+assert(newSignatureFromBytes($sigNil) == nil)

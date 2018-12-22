@@ -33,4 +33,7 @@ assert(pubKey3 == pubKey4)
 #Test null Public Keys.
 assert(pubKeyNil == pubKeyNil)
 assert(pubKeyNil != pubKey1)
+
 assert(pubKeyNil.toString() == newString(48))
+assert(newPublicKeyFromBytes(pubKeyNil.toString()) == nil)
+assert(newPublicKeyFromBytes($pubKeyNil) == nil)
