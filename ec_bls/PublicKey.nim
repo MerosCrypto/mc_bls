@@ -82,15 +82,25 @@ func aggregate*(keys: seq[PublicKey]): PublicKey =
 
 #Equality operators.
 func `==`*(lhs: PublicKey, rhs: PublicKey): bool =
-    lhs[] == rhs[]
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) == cast[int](rhs)
+
+    result = lhs[] == rhs[]
 
 func `!=`*(lhs: PublicKey, rhs: PublicKey): bool =
-    lhs[] != rhs[]
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) != cast[int](rhs)
+
+    result = lhs[] != rhs[]
 
 #Stringify a Public Key.
 func toString*(key: PublicKey): string =
     #Create the result string.
     result = newString(48)
+
+    #Check if the Key is null.
+    if key.isNil:
+        return
 
     #Serialize the key into the string.
     key[].serialize(cast[ptr uint8](addr result[0]))

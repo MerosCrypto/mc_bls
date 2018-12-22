@@ -15,6 +15,8 @@ var
     pubKey3: PublicKey = newPublicKeyFromBytes($pubKey1)
     #From a different Private Key.
     pubKey4: PublicKey = privKey2.getPublicKey()
+    #Null Public Key.
+    pubKeyNil: PublicKey = nil
 
 #Make sure the first 3 keys are the same.
 assert(pubKey1 == pubKey2)
@@ -27,3 +29,8 @@ assert(pubKey3 != pubKey4)
 pubKey4 = pubKey3
 #Check their values.
 assert(pubKey3 == pubKey4)
+
+#Test null Public Keys.
+assert(pubKeyNil == pubKeyNil)
+assert(pubKeyNil != pubKey1)
+assert(pubKeyNil.toString() == newString(48))

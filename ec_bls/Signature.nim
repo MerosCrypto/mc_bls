@@ -86,10 +86,16 @@ func setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
     sig[].cSetAggregationInfo(agInfo)
 
 func `==`*(lhs: Signature, rhs: Signature): bool =
-    lhs[] == rhs[]
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) == cast[int](rhs)
+
+    result = lhs[] == rhs[]
 
 func `!=`*(lhs: Signature, rhs: Signature): bool =
-    lhs[] != rhs[]
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) != cast[int](rhs)
+
+    result = lhs[] != rhs[]
 
 #Verify.
 func verify*(sig: Signature): bool =
@@ -99,6 +105,11 @@ func verify*(sig: Signature): bool =
 func toString*(sig: Signature): string =
     #Create the result string.
     result = newString(96)
+
+    #Check if the Signature is null.
+    if sig.isNil:
+        return
+
     #Serialize the sig into the string.
     sig[].serialize(cast[ptr uint8](addr result[0]))
 

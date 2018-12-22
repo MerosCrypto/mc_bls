@@ -13,6 +13,8 @@ var
     sig2: Signature = newSignatureFromBytes($sig1)
     #Create the Aggregation Info.
     agInfo: AggregationInfo = newAggregationInfoFromMsg(pub, msg)
+    #Null Signature.
+    sigNil: Signature = nil
 
 #Add the Aggregation Info to the signature.
 sig2.setAggregationInfo(agInfo)
@@ -21,3 +23,8 @@ sig2.setAggregationInfo(agInfo)
 assert(sig1.getAggregationInfo() == sig2.getAggregationInfo())
 assert(sig1.toString() == sig2.toString())
 assert(sig2.verify())
+
+#Test null signatures.
+assert(sigNil == sigNil)
+assert(sigNil != sig1)
+assert(sigNil.toString() == newString(96))
