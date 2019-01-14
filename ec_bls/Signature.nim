@@ -92,6 +92,12 @@ func newSignatureFromBytes*(sigArg: string): Signature =
 
 #Aggregate.
 func aggregate*(sigs: seq[Signature]): Signature =
+    #Handle cases where there's 0 or 1 sig.
+    if sigs.len == 0:
+        return nil
+    if sigs.len == 1:
+        return sigs[0]
+
     #Allocate the Signature.
     result = (Objects.Signature)()
     #Aggregate the Signatures.
