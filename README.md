@@ -14,10 +14,10 @@ git checkout 5401869ae1a6f0235094fdfc93c51208c80d3000
 git submodule update --init --recursive
 ```
 
-2) Apply the following diff file.
+2) Add `tree = AggregationInfo::AggregationTree();` after line 247, but before line 248, to `src/aggregationinfo.cpp`. To be more exact, here is a diff file.
 ```
 diff --git a/src/aggregationinfo.cpp b/src/aggregationinfo.cpp
-index 0cefddd..d29da52 100644
+index 0cefddd..690ceed 100644
 --- a/src/aggregationinfo.cpp
 +++ b/src/aggregationinfo.cpp
 @@ -245,6 +245,7 @@ std::ostream &operator<<(std::ostream &os, AggregationInfo const &a) {
@@ -28,17 +28,6 @@ index 0cefddd..d29da52 100644
      InsertIntoTree(tree, rhs);
      SortIntoVectors(sortedMessageHashes, sortedPubKeys, tree);
      return *this;
-@@ -253,8 +254,8 @@ AggregationInfo& AggregationInfo::operator=(const AggregationInfo &rhs) {
- void AggregationInfo::InsertIntoTree(AggregationInfo::AggregationTree &tree,
-                                      const AggregationInfo& info) {
-     for (auto &mapEntry : info.tree) {
--        uint8_t* messageCopy = new uint8_t[BLS::MESSAGE_HASH_LEN
--                + PublicKey::PUBLIC_KEY_SIZE];
-+        uint8_t* messageCopy = (uint8_t*) malloc(BLS::MESSAGE_HASH_LEN
-+                + PublicKey::PUBLIC_KEY_SIZE);
-         std::memcpy(messageCopy, mapEntry.first, BLS::MESSAGE_HASH_LEN
-                 + PublicKey::PUBLIC_KEY_SIZE);
-         bn_t * exponent = new bn_t[1]
  ```
 
 3) Build Chia's BLS library.
