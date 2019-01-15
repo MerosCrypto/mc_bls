@@ -91,6 +91,11 @@ func newPublicKeyFromBytes*(keyArg: string): PublicKey =
 
 #Aggregate.
 func aggregate*(keys: seq[PublicKey]): PublicKey =
+    if keys.len == 0:
+        return nil
+    if keys.len == 1:
+        return keys[0]
+    
     #Allocate the Public Key.
     result = (Objects.PublicKey)()
     #Aggregate the Public Keys.

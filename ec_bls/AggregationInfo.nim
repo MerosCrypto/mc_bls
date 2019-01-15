@@ -48,6 +48,9 @@ func newAggregationInfoFromMsg*(
 
 #Aggregate.
 func aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
+    if agInfos.len == 1:
+        return agInfos[0]
+
     aggregateAggregationInfos(agInfos)
 
 func getAggregationInfo*(

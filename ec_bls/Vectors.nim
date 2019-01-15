@@ -22,17 +22,17 @@ func newSignatureVector(): SignatureVector {.
     constructor
 .}
 
-func add(
+func push(
     vector: PublicKeyVector,
     key: PublicKeyObject
 ) {.importcpp: "#.push_back(@)"}
 
-func add(
+func push(
     vector: AggregationInfoVector,
     agInfo: AggregationInfo
 ) {.importcpp: "#.push_back(@)"}
 
-func add(
+func push(
     vector: SignatureVector,
     key: SignatureObject
 ) {.importcpp: "#.push_back(@)"}
@@ -42,14 +42,14 @@ func add(
 converter toVector*(keys: seq[PublicKey]): PublicKeyVector =
     result = newPublicKeyVector()
     for i in 0 ..< keys.len:
-        result.add(keys[i][])
+        result.push(keys[i][])
 
 converter toVector*(agInfos: seq[AggregationInfo]): AggregationInfoVector =
     result = newAggregationInfoVector()
     for i in 0 ..< agInfos.len:
-        result.add(agInfos[i])
+        result.push(agInfos[i])
 
 converter toVector*(sigs: seq[Signature]): SignatureVector =
     result = newSignatureVector()
     for i in 0 ..< sigs.len:
-        result.add(sigs[i][])
+        result.push(sigs[i][])

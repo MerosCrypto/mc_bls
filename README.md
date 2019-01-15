@@ -6,7 +6,7 @@ A Nim Wrapper for [Chia's BLS Library](https://github.com/chia-network/bls-signa
 
 1) Download all the needed files.
 ```
-nimble install https://github.com/EmberCrypto/ec_bls/
+nimble install https://github.com/MerosCrypto/ec_bls/
 
 git clone https://github.com/chia-network/bls-signatures
 cd bls-signatures
