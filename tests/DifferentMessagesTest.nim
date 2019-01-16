@@ -38,15 +38,13 @@ var
     #Stringify the sig and read it back.
     sig2: Signature = newSignatureFromBytes(sig1.toString())
     #Create the Aggregation Infos.
-    agInfos: seq[AggregationInfo] = @[
-        newAggregationInfoFromMsg(pubs[0], msgs[0]),
-        newAggregationInfoFromMsg(pubs[1], msgs[1]),
-        newAggregationInfoFromMsg(pubs[2], msgs[2]),
-        newAggregationInfoFromMsg(pubs[3], msgs[3]),
-        newAggregationInfoFromMsg(pubs[4], msgs[4]),
-    ]
-    #Aggregate the Aggregation Infos.
-    agInfo: AggregationInfo = agInfos.aggregate()
+    agInfos: seq[ptr AggregationInfo] = newSeq[ptr AggregationInfo](5)
+for i in 0 ..< 5:
+    agInfos[i] = cast[ptr AggregationInfo](alloc0(sizeof(AggregationInfo)))
+    agInfos[i][] = newAggregationInfoFromMsg(pubs[i], msgs[i])
+
+#Aggregate the Aggregation Infos.
+var agInfo: AggregationInfo = agInfos.aggregate()
 
 #Add the Aggregation Info to the signature.
 sig2.setAggregationInfo(agInfo)

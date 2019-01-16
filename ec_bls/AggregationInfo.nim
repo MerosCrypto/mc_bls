@@ -47,11 +47,11 @@ func newAggregationInfoFromMsg*(
     )
 
 #Aggregate.
-func aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
+func aggregate*(agInfos: seq[ptr AggregationInfo]): AggregationInfo =
     if agInfos.len == 1:
-        return agInfos[0]
+        return agInfos[0][]
 
-    aggregateAggregationInfos(agInfos)
+    aggregateAggregationInfos(agInfos.toVector())
 
 func getAggregationInfo*(
     sig: Signature

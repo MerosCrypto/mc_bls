@@ -44,10 +44,10 @@ converter toVector*(keys: seq[PublicKey]): PublicKeyVector =
     for i in 0 ..< keys.len:
         result.push(keys[i][])
 
-converter toVector*(agInfos: seq[AggregationInfo]): AggregationInfoVector =
+converter toVector*(agInfos: seq[ptr AggregationInfo]): AggregationInfoVector =
     result = newAggregationInfoVector()
     for i in 0 ..< agInfos.len:
-        result.push(agInfos[i])
+        result.push(agInfos[i][])
 
 converter toVector*(sigs: seq[Signature]): SignatureVector =
     result = newSignatureVector()
