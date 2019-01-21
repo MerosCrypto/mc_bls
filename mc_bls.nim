@@ -18,11 +18,11 @@ if not init():
     raise newException(Exception, "Couldn't init the BLS lib.")
 
 #Import each of the BLS files.
-import ec_bls/Objects
-import ec_bls/PrivateKey
-import ec_bls/PublicKey
-import ec_bls/Signature
-import ec_bls/AggregationInfo
+import mc_bls/Objects
+import mc_bls/PrivateKey
+import mc_bls/PublicKey
+import mc_bls/Signature
+import mc_bls/AggregationInfo
 
 #Export the public objects and tbe sublibraries.
 export Objects.PrivateKey, Objects.PublicKey

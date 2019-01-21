@@ -1,5 +1,5 @@
 #BLS lib.
-import ../ec_bls
+import ../mc_bls
 
 var
     #Create the key pair.

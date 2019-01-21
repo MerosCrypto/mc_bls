@@ -4,11 +4,11 @@ description = "A Nim Wrapper for Chia's BLS Library."
 license     = "MIT"
 
 installFiles = @[
-    "ec_bls.nim"
+    "mc_bls.nim"
 ]
 
 installDirs = @[
-    "ec_bls",
+    "mc_bls",
     "Chia"
 ]
 
