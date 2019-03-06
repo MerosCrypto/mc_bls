@@ -29,7 +29,7 @@ func push(
 
 func push(
     vector: AggregationInfoVector,
-    agInfo: AggregationInfo
+    agInfo: AggregationInfoObject
 ) {.importcpp: "#.push_back(@)"}
 
 func push(
@@ -44,7 +44,7 @@ converter toVector*(keys: seq[PublicKey]): PublicKeyVector =
     for i in 0 ..< keys.len:
         result.push(keys[i][])
 
-converter toVector*(agInfos: seq[ptr AggregationInfo]): AggregationInfoVector =
+converter toVector*(agInfos: seq[AggregationInfo]): AggregationInfoVector =
     result = newAggregationInfoVector()
     for i in 0 ..< agInfos.len:
         result.push(agInfos[i][])

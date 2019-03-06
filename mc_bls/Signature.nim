@@ -32,7 +32,7 @@ func `!=`(
 #Set Aggregation Info.
 func cSetAggregationInfo(
     sig: SignatureObject,
-    agInfo: AggregationInfo
+    agInfo: AggregationInfoObject
 ) {.importcpp: "#.SetAggregationInfo(@)".}
 
 #Verify.
@@ -49,7 +49,7 @@ func serialize(
 {.pop.}
 
 #Constructor.
-func newSignatureFromBytes*(sigArg: string): Signature =
+proc newSignatureFromBytes*(sigArg: string): Signature =
     #Check this isn't a null sig.
     var broke: bool = false
     if sigArg.len == 96:
@@ -71,7 +71,7 @@ func newSignatureFromBytes*(sigArg: string): Signature =
         raise newException(ValueError, "Invalid BLS Public sig length.")
 
     #Allocate the Signature.
-    result = (Objects.Signature)()
+    result = cast[Signature](alloc0(sizeof(SignatureObject)))
 
     #If a binary string was passed in...
     if sigArg.len == 96:
@@ -91,7 +91,7 @@ func newSignatureFromBytes*(sigArg: string): Signature =
         result[] = signatureFromBytes(addr sig[0])
 
 #Aggregate.
-func aggregate*(sigs: seq[Signature]): Signature =
+proc aggregate*(sigs: seq[Signature]): Signature =
     #Handle cases where there's 0 or 1 sig.
     if sigs.len == 0:
         return nil
@@ -99,13 +99,13 @@ func aggregate*(sigs: seq[Signature]): Signature =
         return sigs[0]
 
     #Allocate the Signature.
-    result = (Objects.Signature)()
+    result = cast[Signature](alloc0(sizeof(SignatureObject)))
     #Aggregate the Signatures.
     result[] = aggregateSignatures(sigs)
 
 #Set Aggregation Info.
 func setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
-    sig[].cSetAggregationInfo(agInfo)
+    sig[].cSetAggregationInfo(agInfo[])
 
 func `==`*(lhs: Signature, rhs: Signature): bool =
     if lhs.isNil or rhs.isNil:

@@ -5,12 +5,13 @@ type
     PrivateKeyObject* {.importcpp: "bls::PrivateKey".} = object
     PublicKeyObject* {.importcpp: "bls::PublicKey".} = object
     SignatureObject* {.importcpp: "bls::Signature".} = object
-    AggregationInfo* {.importcpp: "bls::AggregationInfo".} = object
+    AggregationInfoObject* {.importcpp: "bls::AggregationInfo".} = object
 
 {.pop.}
 
 #Wrappers.
 type
-    PrivateKey* = ref PrivateKeyObject
-    PublicKey* = ref PublicKeyObject
-    Signature* = ref SignatureObject
+    PrivateKey* = ptr PrivateKeyObject
+    PublicKey* = ptr PublicKeyObject
+    Signature* = ptr SignatureObject
+    AggregationInfo* = ptr AggregationInfoObject

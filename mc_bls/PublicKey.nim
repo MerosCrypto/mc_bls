@@ -42,13 +42,13 @@ func serialize(
 {.pop.}
 
 #Constructors.
-func getPublicKey*(key: PrivateKey): PublicKey =
+proc getPublicKey*(key: PrivateKey): PublicKey =
     #Allocate the Public Key.
-    result = (Objects.PublicKey)()
+    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
     #Create the Public Key.
     result[] = publicKeyFromPrivateKey(key[])
 
-func newPublicKeyFromBytes*(keyArg: string): PublicKey =
+proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
     #Check this isn't a null key.
     var broke: bool = false
     if keyArg.len == 48:
@@ -70,7 +70,7 @@ func newPublicKeyFromBytes*(keyArg: string): PublicKey =
         raise newException(ValueError, "Invalid BLS Public Key length.")
 
     #Allocate the Public Key.
-    result = (Objects.PublicKey)()
+    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
 
     #If a binary string was passed in...
     if keyArg.len == 48:
@@ -90,14 +90,14 @@ func newPublicKeyFromBytes*(keyArg: string): PublicKey =
         result[] = publicKeyFromBytes(addr key[0])
 
 #Aggregate.
-func aggregate*(keys: seq[PublicKey]): PublicKey =
+proc aggregate*(keys: seq[PublicKey]): PublicKey =
     if keys.len == 0:
         return nil
     if keys.len == 1:
         return keys[0]
-    
+
     #Allocate the Public Key.
-    result = (Objects.PublicKey)()
+    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
     #Aggregate the Public Keys.
     result[] = aggregatePublicKeys(keys)
 

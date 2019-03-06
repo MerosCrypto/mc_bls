@@ -14,46 +14,74 @@ func aggregationInfoFromMsg(
     key: PublicKeyObject,
     msg: ptr uint8,
     len: uint
-): AggregationInfo {.importcpp: "bls::AggregationInfo::FromMsg(@)".}
+): AggregationInfoObject {.importcpp: "bls::AggregationInfo::FromMsg(@)".}
 
 func aggregationInfoFromSig(
     sig: SignatureObject
-): ptr AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
+): AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
 
 func aggregateAggregationInfos(
     vec: AggregationInfoVector
-): AggregationInfo {.importcpp: "bls::AggregationInfo::MergeInfos(@)".}
+): AggregationInfoObject {.importcpp: "bls::AggregationInfo::MergeInfos(@)".}
 
 func `==`*(
-    lhs: AggregationInfo,
-    rhs: AggregationInfo
+    lhs: AggregationInfoObject,
+    rhs: AggregationInfoObject
 ): bool {.importcpp: "# == #".}
+
+func `!=`*(
+    lhs: AggregationInfoObject,
+    rhs: AggregationInfoObject
+): bool {.importcpp: "# != #".}
 
 {.pop.}
 
 #Constructor.
-func newAggregationInfoFromMsg*(
+proc newAggregationInfoFromMsg*(
     key: PublicKey,
     msgArg: string
 ): AggregationInfo =
     #Extract the message.
     var msg: string = msgArg
 
+    #Allocate the AggregationInfo.
+    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
+
     #Create the AggregationInfo.
-    result = aggregationInfoFromMsg(
+    result[] = aggregationInfoFromMsg(
         key[],
         cast[ptr uint8](addr msg[0]),
         uint(msg.len)
     )
 
 #Aggregate.
-func aggregate*(agInfos: seq[ptr AggregationInfo]): AggregationInfo =
-    if agInfos.len == 1:
-        return agInfos[0][]
+proc aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
+    if agInfos.len == 0:
+        return nil
+    elif agInfos.len == 1:
+        return agInfos[0]
 
-    aggregateAggregationInfos(agInfos.toVector())
+    #Allocate the AggregationInfo.
+    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
 
-func getAggregationInfo*(
+    result[] = aggregateAggregationInfos(agInfos.toVector())
+
+func `==`*(
+    lhs: AggregationInfo,
+    rhs: AggregationInfo
+): bool =
+    lhs[] == rhs[]
+
+func `!=`*(
+    lhs: AggregationInfo,
+    rhs: AggregationInfo
+): bool =
+    lhs[] != rhs[]
+
+proc getAggregationInfo*(
     sig: Signature
 ): AggregationInfo =
-    aggregationInfoFromSig(sig[])[]
+    #Allocate the AggregationInfo.
+    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
+
+    result[] = aggregationInfoFromSig(sig[])[]

@@ -43,9 +43,9 @@ func serialize(
 {.pop.}
 
 #Constructors.
-func newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
+proc newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
     #Allocate the Private Key.
-    result = (Objects.PrivateKey)()
+    result = cast[PrivateKey](alloc0(sizeof(PrivateKeyObject)))
     #Extract the seed arg.
     var seed: string = seedArg
     #Create the Private Key.
@@ -54,9 +54,9 @@ func newPrivateKeyFromSeed*(seedArg: string): PrivateKey =
         uint(seed.len)
     )
 
-func newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
+proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
     #Allocate the Private Key.
-    result = (Objects.PrivateKey)()
+    result = cast[PrivateKey](alloc0(sizeof(PrivateKeyObject)))
 
     #If a binary string was passed in...
     if keyArg.len == 32:
@@ -87,9 +87,9 @@ func `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
     lhs[] != rhs[]
 
 #Sign a message.
-func sign*(key: PrivateKey, msgArg: string): Signature =
+proc sign*(key: PrivateKey, msgArg: string): Signature =
     #Allocate the Signature.
-    result = Signature()
+    result = cast[Signature](alloc0(sizeof(SignatureObject)))
     #Extract the msg argument.
     var msg: string = msgArg
 
