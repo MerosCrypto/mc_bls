@@ -70,12 +70,18 @@ func `==`*(
     lhs: AggregationInfo,
     rhs: AggregationInfo
 ): bool =
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) == cast[int](rhs)
+
     lhs[] == rhs[]
 
 func `!=`*(
     lhs: AggregationInfo,
     rhs: AggregationInfo
 ): bool =
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) != cast[int](rhs)
+
     lhs[] != rhs[]
 
 proc getAggregationInfo*(

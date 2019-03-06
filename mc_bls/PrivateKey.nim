@@ -81,9 +81,15 @@ proc newPrivateKeyFromBytes*(keyArg: string): PrivateKey =
 
 #Equality operators.
 func `==`*(lhs: PrivateKey, rhs: PrivateKey): bool =
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) == cast[int](rhs)
+
     lhs[] == rhs[]
 
 func `!=`*(lhs: PrivateKey, rhs: PrivateKey): bool =
+    if lhs.isNil or rhs.isNil:
+        return cast[int](lhs) != cast[int](rhs)
+
     lhs[] != rhs[]
 
 #Sign a message.
