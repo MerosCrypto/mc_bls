@@ -37,7 +37,7 @@ cd build
 cmake ../
 cmake --build . -- -j 6
 ```
-If there's a complaint about `Python.h`, you can install it on Debian based systems via the `python-dev` package.
+If there's a complaint about `Python.h`, you can install it on Debian based systems via the `python3-dev` package.
 
 4) Place the generated `build/` folder (which you are in) inside the Nimble package's `Chia/` folder. The Nimble package can be found in `~/.nimble/pkgs` (on Linux and Mac OS) or in `C:\Users\USERNAME\.nimble\pkgs` (on Windows).
 
