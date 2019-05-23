@@ -25,6 +25,8 @@
 #include "signature.hpp"
 namespace bls {
 class PrivateKey {
+friend class BLS;
+friend class Threshold;
  public:
     // Private keys are represented as 32 byte field elements. Note that
     // not all 32 byte integers are valid keys, the private key must be
@@ -38,6 +40,9 @@ class PrivateKey {
 
     // Construct a private key from a bytearray.
     static PrivateKey FromBytes(const uint8_t* bytes, bool modOrder = false);
+
+    // Construct a private key from a native bn element.
+    static PrivateKey FromBN(bn_t sk);
 
     // Construct a private key from another private key. Allocates memory in
     // secure heap, and copies keydata.
@@ -64,12 +69,20 @@ class PrivateKey {
     void Serialize(uint8_t* buffer) const;
     std::vector<uint8_t> Serialize() const;
 
-    // Sign a message
-    // The secure variants will also set and return appropriate aggregation info
+    // Sign a message without setting aggreagation info.
     InsecureSignature SignInsecure(const uint8_t *msg, size_t len) const;
     InsecureSignature SignInsecurePrehashed(const uint8_t *hash) const;
+
+    // The secure Signing variants, which also set and return appropriate aggregation info.
     Signature Sign(const uint8_t *msg, size_t len) const;
     Signature SignPrehashed(const uint8_t *hash) const;
+
+    // Helper methods to prepend the public key to the message, allowing secure
+    // aggregation by proof of posession of public key. These must be verified using
+    // VerifyPrepend. These signatures are identical to Insecure signatures, but are generated
+    // and verified by prepending the pulic keys: Sign(H(pk + H(m))).
+    PrependSignature SignPrepend(const uint8_t *msg, size_t len) const;
+    PrependSignature SignPrependPrehashed(const uint8_t *msg) const;
 
  private:
     // Don't allow public construction, force static methods

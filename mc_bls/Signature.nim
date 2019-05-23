@@ -16,7 +16,7 @@ func signatureFromBytes(
 
 func aggregateSignatures(
     vec: SignatureVector
-): SignatureObject {.importcpp: "bls::Signature::AggregateSigs(@)".}
+): SignatureObject {.importcpp: "bls::Signature::Aggregate(@)".}
 
 #Equality operators
 func `==`(

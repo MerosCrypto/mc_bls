@@ -10,7 +10,7 @@ nimble install https://github.com/MerosCrypto/mc_bls/
 
 git clone https://github.com/chia-network/bls-signatures
 cd bls-signatures
-git checkout 5401869ae1a6f0235094fdfc93c51208c80d3000
+git checkout 802bc2b2d7be33a309ece87ee0c32f547a2ad8d7
 git submodule update --init --recursive
 ```
 
