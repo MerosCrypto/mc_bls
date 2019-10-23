@@ -68,7 +68,7 @@ proc newSignatureFromBytes*(sigArg: string): Signature =
             return nil
     #Else, throw an error.
     else:
-        raise newException(ValueError, "Invalid BLS Public sig length.")
+        raise newException(ValueError, "Invalid BLS Signature length.")
 
     #Allocate the Signature.
     result = cast[Signature](alloc0(sizeof(SignatureObject)))
