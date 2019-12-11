@@ -1,11 +1,10 @@
-version     = "2.0.2"
+version     = "2.0.3"
 author      = "Luke Parker"
 description = "A Nim Wrapper for Milagro."
 license     = "MIT"
 
 installDirs = @[
-    "mc_bls",
-    "incubator-milagro-crypto-c"
+    "mc_bls"
 ]
 
 installFiles = @[
