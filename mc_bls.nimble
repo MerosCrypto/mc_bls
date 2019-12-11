@@ -1,4 +1,4 @@
-version     = "2.0.4"
+version     = "2.0.5"
 author      = "Luke Parker"
 description = "A Nim Wrapper for Milagro."
 license     = "MIT"

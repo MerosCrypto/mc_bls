@@ -30,11 +30,4 @@ proc reduce*(
     fp: ptr FP2
 ) {.importc: "FP2_BLS381_reduce".}
 
-#Load a FP2 from two Big384s.
-proc fromBigs*(
-    res: ptr FP2,
-    a: Big384,
-    b: Big384
-) {.importc: "FP2_BLS381_from_BIGs".}
-
 {.pop.}
