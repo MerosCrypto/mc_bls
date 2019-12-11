@@ -3,9 +3,9 @@
 {.push header: "big_384_58.h".}
 
 type
-    Big384*      {.importc: "BIG_384_58".} = object
-    ConstBig384* {.importc: "const BIG_384_58".} = object
-    DBig384*     {.importc: "DBIG_384_58".} = object
+    Big384*      {.importc: "BIG_384_58", bycopy.} = object
+    ConstBig384* {.importc: "const BIG_384_58", bycopy.} = object
+    DBig384*     {.importc: "DBIG_384_58", bycopy.} = object
 
 {.pop.}
 

@@ -10,7 +10,7 @@ const SHA3_SHAKE256: cint = 32
 
 type
     #Milagro's custom string format.
-    Octet {.importc: "octet".} = object
+    Octet {.importc: "octet", bycopy.} = object
         len: cint
         max: cint
         val: cstring
@@ -19,7 +19,7 @@ type
     #This is needed to hash a message so it can be mapped to a G1.
     #The plan was to call the existing BLS_HASHIT yet it's private.
     #We've had to rewrite it and call the functions it calls, which are still public.
-    SHA3 {.importc: "sha3".} = object
+    SHA3 {.importc: "sha3", bycopy.} = object
 
 #SHA3 functions.
 proc init(

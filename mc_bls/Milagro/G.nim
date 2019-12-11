@@ -4,12 +4,12 @@ import Big384
 import FP
 
 type
-    G1* {.importc: "ECP_BLS381", header: "ecp_BLS381.h".} = object
+    G1* {.importc: "ECP_BLS381", header: "ecp_BLS381.h", bycopy.} = object
         x*: FP1
         y*: FP1
         z*: FP1
 
-    G2* {.importc: "ECP2_BLS381", header: "ecp2_BLS381.h".} = object
+    G2* {.importc: "ECP2_BLS381", header: "ecp2_BLS381.h", bycopy.} = object
         x*: FP2
         y*: FP2
         z*: FP2

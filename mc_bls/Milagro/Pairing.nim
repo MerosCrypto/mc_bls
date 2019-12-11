@@ -4,7 +4,7 @@
 
 import G
 
-type FP12* {.importc: "FP12_BLS381", header: "fp12_BLS381.h".} = object
+type FP12* {.importc: "FP12_BLS381", header: "fp12_BLS381.h", bycopy.} = object
 
 {.push header: "pair_BLS381.h".}
 

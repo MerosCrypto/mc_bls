@@ -3,11 +3,11 @@
 import Big384
 
 type
-    FP1* {.importc: "FP_BLS381", header: "fp_BLS381.h".} = object
+    FP1* {.importc: "FP_BLS381", header: "fp_BLS381.h", bycopy.} = object
         g*: Big384
         XES*: int32
 
-    FP2* {.importc: "FP2_BLS381", header: "fp2_BLS381.h".} = object
+    FP2* {.importc: "FP2_BLS381", header: "fp2_BLS381.h", bycopy.} = object
         a*: FP1
         b*: FP1
 
