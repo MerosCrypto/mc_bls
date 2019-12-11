@@ -38,13 +38,13 @@ proc shake(
     len: cint
 ) {.importc: "SHA3_shake".}
 
+{.pop.}
+
 #Map a hash stored in an octet to a G1.
 proc hashToG(
     res: ptr G1,
     hash: ptr Octet
-) {.importc: "ECP_BLS381_mapit".}
-
-{.pop.}
+) {.importc: "ECP_BLS381_mapit", header: "ecp_BLS381.h".}
 
 #Hash a message and convert it to a G! element.
 proc msgToG*(
