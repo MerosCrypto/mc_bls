@@ -40,6 +40,6 @@ after install:
     withDir milagroDir:
         mkDir "build"
 
-    withDir milagroDir & os.DirSep & "build":
+    withDir milagroDir / "build":
         exec cmakeExe & " -DBUILD_SHARED_LIBS=OFF -DAMCL_CURVE=BLS381 .."
         exec makeExe
