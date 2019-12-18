@@ -1,15 +1,16 @@
-version     = "1.0.0"
+version     = "2.0.6"
 author      = "Luke Parker"
-description = "A Nim Wrapper for Chia's BLS Library."
+description = "A Nim Wrapper for Milagro."
 license     = "MIT"
 
-installFiles = @[
-    "mc_bls.nim"
-]
-
 installDirs = @[
-    "mc_bls",
-    "Chia"
+    "mc_bls"
 ]
 
-requires "nim > 0.18.0"
+installFiles = @[
+    "LICENSE",
+    "mc_bls.nim",
+    "README.md"
+]
+
+requires "nim > 1.0.0"

@@ -1,139 +1,157 @@
-#BLS Objects.
-import Objects
+#Public Key library.
 
-#Vectors.
-import Vectors
+import Milagro/Big384 as Big384File
+import Milagro/FP
+import Milagro/G
 
-#String utils standard lib.
-import strutils
+import Common
+import PrivateKey
 
-{.push, header: "bls.hpp".}
+type PublicKey* = object
+    value*: G2
 
-#Constructors.
-func publicKeyFromPrivateKey(
-    key: PrivateKeyObject
-): PublicKeyObject {.importcpp: "#.GetPublicKey()".}
+#PublicKey constructors.
+proc newPublicKey*(
+    keyArg: string
+): PublicKey {.raises: [
+    BLSError
+].} =
+    #Check the Public Key is the right length and compressed.
+    if keyArg.len != G2_LEN:
+        raise newException(BLSError, "Invalid Public Key length.")
+    if (uint8(keyArg[0]) and C_FLAG) == 0:
+        raise newException(BLSError, "Uncompressed Public Key.")
+    if (uint8(keyArg[G1_LEN]) and CLEAR_FLAGS) != uint8(keyArg[G1_LEN]):
+        raise newException(BLSError, "G2's second G has flags set.")
 
-func publicKeyFromBytes(
-    bytes: ptr uint8
-): PublicKeyObject {.importcpp: "bls::PublicKey::FromBytes(@)".}
+    #Extract and clear the flags.
+    var
+        key: string = keyArg
+        inf: bool = (uint8(key[0]) and B_FLAG) != 0
+        greaterY: bool = (uint8(key[0]) and A_FLAG) != 0
+    key[0] = char(uint8(key[0]) and CLEAR_FLAGS)
 
-func aggregatePublicKeys(
-    vec: PublicKeyVector
-): PublicKeyObject {.importcpp: "bls::PublicKey::Aggregate(@)".}
+    #Verify the Public Key's infinite property.
+    var c: int = 0
+    while c < G2_LEN:
+        if key[c] != char(0):
+            break
+        inc(c)
+    if inf and (c != G2_LEN):
+        echo c
+        raise newException(BLSError, "Infinite G2 has a non-zeroed pair of 381-bit numbers.")
+    if (not inf) and (c == G2_LEN):
+        raise newException(BLSError, "Non-infinite G2 has a zeroed pair of 381-bit number.")
 
-#Equality operators
-func `==`(
-    lhs: PublicKeyObject,
-    rhs: PublicKeyObject
-): bool {.importcpp: "# == #"}
-
-func `!=`(
-    lhs: PublicKeyObject,
-    rhs: PublicKeyObject
-): bool {.importcpp: "# != #"}
-
-#Serialize.
-func serialize(
-    key: PublicKeyObject,
-    buffer: ptr uint8
-) {.importcpp: "#.Serialize(@)".}
-
-{.pop.}
-
-#Constructors.
-proc getPublicKey*(key: PrivateKey): PublicKey =
-    #Allocate the Public Key.
-    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
-    #Create the Public Key.
-    result[] = publicKeyFromPrivateKey(key[])
-
-proc newPublicKeyFromBytes*(keyArg: string): PublicKey =
-    #Check this isn't a null key.
-    var broke: bool = false
-    if keyArg.len == 48:
-        for b in keyArg:
-            if ord(b) != 0:
-                broke = true
-                break
-        if not broke:
-            return nil
-    elif keyArg.len == 96:
-        for b in keyArg:
-            if b != '0':
-                broke = true
-                break
-        if not broke:
-            return nil
-    #Else, throw an error.
-    else:
-        raise newException(ValueError, "Invalid BLS Public Key length.")
-
-    #Allocate the Public Key.
-    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
-
-    #If a binary string was passed in...
-    if keyArg.len == 48:
-        #Extract the argument.
-        var key: string = keyArg
-        #Create the Public Key.
-        result[] = publicKeyFromBytes(cast[ptr uint8](addr key[0]))
-
-    #If a hex string was passed in...
-    elif keyArg.len == 96:
-        #Define a array for the key.
-        var key: array[48, uint8]
-        #Parse the hex string.
-        for b in countup(0, 95, 2):
-            key[b div 2] = uint8(parseHexInt(keyArg[b .. b + 1]))
-        #Create the Public Key.
-        result[] = publicKeyFromBytes(addr key[0])
-
-#Aggregate.
-proc aggregate*(keys: seq[PublicKey]): PublicKey =
-    if keys.len == 0:
-        return nil
-    if keys.len == 1:
-        return keys[0]
-
-    #Allocate the Public Key.
-    result = cast[PublicKey](alloc0(sizeof(PublicKeyObject)))
-    #Aggregate the Public Keys.
-    result[] = aggregatePublicKeys(keys)
-
-#Equality operators.
-func `==`*(lhs: PublicKey, rhs: PublicKey): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) == cast[int](rhs)
-
-    result = lhs[] == rhs[]
-
-func `!=`*(lhs: PublicKey, rhs: PublicKey): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) != cast[int](rhs)
-
-    result = lhs[] != rhs[]
-
-#Stringify a Public Key.
-func toString*(key: PublicKey): string =
-    #Create the result string.
-    result = newString(48)
-
-    #Check if the Key is null.
-    if key.isNil:
+    #Set infinite and return if infinite.
+    if inf:
+        inf(addr result.value)
         return
 
-    #Serialize the key into the string.
-    key[].serialize(cast[ptr uint8](addr result[0]))
+    #Load x.
+    var
+        a: Big384
+        b: Big384
+        x: FP2
+    a.loadBytes(addr key[0], cint(G1_LEN))
+    b.loadBytes(addr key[G1_LEN], cint(G1_LEN))
+    (addr x).fromBigs(b, a)
 
-#Stringify a Public Key for printing.
-func `$`*(key: PublicKey): string =
-    #Create the result string.
-    result = ""
+    #Set x.
+    if (addr result.value).setx(addr x) == 0:
+        raise newException(BLSError, "Invalid G2.")
 
-    #Get the binary version of the string.
-    var serialized: string = key.toString()
+    #Calculate both Ys.
+    var
+        yNeg: FP2
+        cmpRes: int
+    (addr yNeg).neg(addr result.value.y)
 
-    #Format the serialized string into a hex string.
-    for i in serialized:
-        result &= uint8(i).toHex()
+    #Compare the Ys.
+    redc(a, addr result.value.y.b)
+    redc(b, addr yNeg.b)
+    cmpRes = cmp(a, b)
+    if cmpRes == 0:
+        redc(a, addr result.value.y.a)
+        redc(b, addr yNeg.a)
+        cmpRes = cmp(a, b)
+
+    #Use the correct Y.
+    if (cmpRes == 1) != greaterY:
+        result.value.y = yNeg
+
+proc toPublicKey*(
+    key: PrivateKey
+): PublicKey {.raises: [].} =
+    newGenerator(addr result.value)
+    mul(addr result.value, key.value)
+
+#Check if a Public Key is infinite.
+proc isInf*(
+    keyArg: PublicKey
+): bool {.raises: [].} =
+    var key: G2 = keyArg.value
+    return (addr key).isInf == 1
+
+#Aggregate Public Keys.
+proc aggregate*(
+    keysArg: seq[PublicKey]
+): PublicKey {.raises: [].} =
+    if keysArg.len == 0:
+        inf(addr result.value)
+        return
+
+    result.value = keysArg[0].value
+    var keys: seq[PublicKey] = keysArg[1 ..< keysArg.len]
+    for k in 0 ..< keys.len:
+        if keys[k].isInf:
+            inf(addr result.value)
+            return
+
+        doAssert(add(addr result.value, addr keys[k].value) == 0)
+
+#Serialize a Public Key.
+proc serialize*(
+    keyArg: PublicKey
+): string {.raises: [].} =
+    var
+        key: PublicKey = keyArg
+        x: FP2
+        y: FP2
+        a: Big384
+        b: Big384
+    result = newString(G2_LEN)
+
+    #If the point is infinite, set the compressed/infinite flags and return.
+    if extract(addr x, addr y, addr key.value) == -1:
+        result[0] = char(uint8(result[0]) or C_FLAG)
+        result[0] = char(uint8(result[0]) or B_FLAG)
+        return
+
+    #Reduce and store X.
+    redc(a, addr x.a)
+    redc(b, addr x.b)
+
+    #Serialize the X values and set the compressed flag.
+    (addr result[G1_LEN]).saveBytes(a)
+    (addr result[0]).saveBytes(b)
+    result[0] = char(uint8(result[0]) or C_FLAG)
+
+    #Negate the Y to find out if this is the larger or smaller Y.
+    var
+        yNeg: FP2
+        cmpRes: int
+    (addr yNeg).neg(addr y)
+
+    #Compare the Ys.
+    redc(a, addr y.b)
+    redc(b, addr yNeg.b)
+    cmpRes = cmp(a, b)
+    if cmpRes == 0:
+        redc(a, addr y.a)
+        redc(b, addr yNeg.a)
+        cmpRes = cmp(a, b)
+
+    #If this is the larger Y, set the flag.
+    if cmpRes == 1:
+        result[0] = char(uint8(result[0]) or A_FLAG)

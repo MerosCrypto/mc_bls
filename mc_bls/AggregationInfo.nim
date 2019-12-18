@@ -1,93 +1,48 @@
-#BLS Objects.
-import Objects
+#Aggregation Info library.
 
-#Vectors.
-import Vectors
+import Milagro/G
+import Milagro/HashToG
+import Milagro/Pairing
 
-#String utils standard lib.
-import strutils
+import Common
+import PublicKey
 
-{.push, header: "bls.hpp".}
+type AggregationInfo* = object
+    value*: FP12
 
-#Constructor.
-func aggregationInfoFromMsg(
-    key: PublicKeyObject,
-    msg: ptr uint8,
-    len: uint
-): AggregationInfoObject {.importcpp: "bls::AggregationInfo::FromMsg(@)".}
-
-func aggregationInfoFromSig(
-    sig: SignatureObject
-): AggregationInfo {.importcpp: "#.GetAggregationInfo()".}
-
-func aggregateAggregationInfos(
-    vec: AggregationInfoVector
-): AggregationInfoObject {.importcpp: "bls::AggregationInfo::MergeInfos(@)".}
-
-func `==`*(
-    lhs: AggregationInfoObject,
-    rhs: AggregationInfoObject
-): bool {.importcpp: "# == #".}
-
-func `!=`*(
-    lhs: AggregationInfoObject,
-    rhs: AggregationInfoObject
-): bool {.importcpp: "# != #".}
-
-{.pop.}
-
-#Constructor.
-proc newAggregationInfoFromMsg*(
-    key: PublicKey,
+#AggregationInfo constructors.
+proc newAggregationInfo*(
+    keyArg: PublicKey,
     msgArg: string
-): AggregationInfo =
-    #Extract the message.
-    var msg: string = msgArg
+): AggregationInfo {.raises: [
+    BLSError
+].} =
+    if keyArg.isInf:
+        raise newException(BLSError, "Infinite Public Key passed to newAggregationInfo.")
 
-    #Allocate the AggregationInfo.
-    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
+    var
+        key: PublicKey = keyArg
+        msg: G1 = msgToG(msgArg)
+    pair(addr result.value, addr key.value, addr msg)
 
-    #Create the AggregationInfo.
-    result[] = aggregationInfoFromMsg(
-        key[],
-        cast[ptr uint8](addr msg[0]),
-        uint(msg.len)
-    )
+proc newAggregationInfo*(
+    keys: seq[PublicKey],
+    msg: string
+): AggregationInfo {.inline, raises: [
+    BLSError
+].} =
+    newAggregationInfo(keys.aggregate(), msg)
 
-#Aggregate.
-proc aggregate*(agInfos: seq[AggregationInfo]): AggregationInfo =
-    if agInfos.len == 0:
-        return nil
-    elif agInfos.len == 1:
-        return agInfos[0]
+#Aggregate Aggregation Infos.
+proc aggregate*(
+    agInfosArg: seq[AggregationInfo]
+): AggregationInfo {.raises: [
+    BLSError
+].} =
+    if agInfosArg.len == 0:
+        raise newException(BLSError, "No Aggregation Infos passed to aggregate.")
 
-    #Allocate the AggregationInfo.
-    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
-
-    result[] = aggregateAggregationInfos(agInfos.toVector())
-
-func `==`*(
-    lhs: AggregationInfo,
-    rhs: AggregationInfo
-): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) == cast[int](rhs)
-
-    lhs[] == rhs[]
-
-func `!=`*(
-    lhs: AggregationInfo,
-    rhs: AggregationInfo
-): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) != cast[int](rhs)
-
-    lhs[] != rhs[]
-
-proc getAggregationInfo*(
-    sig: Signature
-): AggregationInfo =
-    #Allocate the AggregationInfo.
-    result = cast[AggregationInfo](alloc0(sizeof(AggregationInfoObject)))
-
-    result[] = aggregationInfoFromSig(sig[])[]
+    var agInfos: seq[AggregationInfo] = agInfosArg
+    for i in 1 ..< agInfos.len:
+        (addr agInfos[0].value).mul(addr agInfos[i].value)
+    return agInfos[0]

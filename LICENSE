@@ -1,16 +1,6 @@
-The bundled Relic header files are under the Apache 2.0 License or the GNU Lesser General Public License Version 2.1, copyright:
-- Diego de Freitas Aranha <dfaranha@gmail.com>
-- Conrado Porto Lopes Gouvêa <conradoplg@gmail.com>
-- Tobias Markmann <tmarkmann@gmail.com>
-Please see the `Chia/contrib/relic` folder for all the licensing info.
-
-The bundled Chia header files are under the Apache 2.0 License, copyright (2018 and onwards) Chia Network Inc. Please see the `Chia/` folder for the full `LICENSE` text.
-
-The Nim Wrapper around this BLS library is released under the following license:
-
 The MIT License (MIT)
 
-Copyright (c) 2018 Luke Parker
+Copyright (c) 2018-2019 Luke Parker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

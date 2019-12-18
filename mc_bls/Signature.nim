@@ -1,148 +1,149 @@
-#BLS Objects.
-import Objects
+#Signature library.
 
-#Vectors.
-import Vectors
+import Milagro/Big384
+import Milagro/FP
+import Milagro/G
+import Milagro/HashToG
+import Milagro/Pairing
 
-#String utils standard lib.
-import strutils
+import Common
+import PrivateKey
+import AggregationInfo
 
-{.push, header: "bls.hpp".}
+type Signature* = object
+    value*: G1
 
-#Constructor.
-func signatureFromBytes(
-    bytes: ptr uint8
-): SignatureObject {.importcpp: "bls::Signature::FromBytes(@)".}
+#Signature constructor.
+proc newSignature*(
+    sigArg: string
+): Signature {.raises: [
+    BLSError
+].} =
+    #Check the Signature is the right length and compressed.
+    if sigArg.len != G1_LEN:
+        raise newException(BLSError, "Invalid Signature length.")
+    if (uint8(sigArg[0]) and C_FLAG) == 0:
+        raise newException(BLSError, "Uncompressed Signature.")
 
-func aggregateSignatures(
-    vec: SignatureVector
-): SignatureObject {.importcpp: "bls::Signature::Aggregate(@)".}
+    #Extract and clear the flags.
+    var
+        sig: string = sigArg
+        inf: bool = (uint8(sig[0]) and B_FLAG) != 0
+        greaterY: bool = (uint8(sig[0]) and A_FLAG) != 0
+    sig[0] = char(uint8(sig[0]) and CLEAR_FLAGS)
 
-#Equality operators
-func `==`(
-    lhs: SignatureObject,
-    rhs: SignatureObject
-): bool {.importcpp: "# == #"}
+    #Verify the Signature's infinite property.
+    var c: int = 0
+    while c < G1_LEN:
+        if sig[c] != char(0):
+            break
+        inc(c)
+    if inf and (c != G1_LEN):
+        raise newException(BLSError, "Infinite G1 has a non-zeroed 381-bit number.")
+    if (not inf) and (c == G1_LEN):
+        raise newException(BLSError, "Non-infinite G1 has a zeroed 381-bit number.")
 
-func `!=`(
-    lhs: SignatureObject,
-    rhs: SignatureObject
-): bool {.importcpp: "# != #"}
-
-#Set Aggregation Info.
-func cSetAggregationInfo(
-    sig: SignatureObject,
-    agInfo: AggregationInfoObject
-) {.importcpp: "#.SetAggregationInfo(@)".}
-
-#Verify.
-func cVerify(
-    sig: SignatureObject
-): bool {.importcpp: "#.Verify()".}
-
-#Serialize.
-func serialize(
-    sig: SignatureObject,
-    buffer: ptr uint8
-) {.importcpp: "#.Serialize(@)".}
-
-{.pop.}
-
-#Constructor.
-proc newSignatureFromBytes*(sigArg: string): Signature =
-    #Check this isn't a null sig.
-    var broke: bool = false
-    if sigArg.len == 96:
-        for b in sigArg:
-            if ord(b) != 0:
-                broke = true
-                break
-        if not broke:
-            return nil
-    elif sigArg.len == 192:
-        for b in sigArg:
-            if b != '0':
-                broke = true
-                break
-        if not broke:
-            return nil
-    #Else, throw an error.
-    else:
-        raise newException(ValueError, "Invalid BLS Signature length.")
-
-    #Allocate the Signature.
-    result = cast[Signature](alloc0(sizeof(SignatureObject)))
-
-    #If a binary string was passed in...
-    if sigArg.len == 96:
-        #Extract the argument.
-        var sig: string = sigArg
-        #Create the Signature.
-        result[] = signatureFromBytes(cast[ptr uint8](addr sig[0]))
-
-    #If a hex string was passed in...
-    elif sigArg.len == 192:
-        #Define a array for the sig.
-        var sig: array[96, uint8]
-        #Parse the hex string.
-        for b in countup(0, 191, 2):
-            sig[b div 2] = uint8(parseHexInt(sigArg[b .. b + 1]))
-        #Create the Signature.
-        result[] = signatureFromBytes(addr sig[0])
-
-#Aggregate.
-proc aggregate*(sigs: seq[Signature]): Signature =
-    #Handle cases where there's 0 or 1 sig.
-    if sigs.len == 0:
-        return nil
-    if sigs.len == 1:
-        return sigs[0]
-
-    #Allocate the Signature.
-    result = cast[Signature](alloc0(sizeof(SignatureObject)))
-    #Aggregate the Signatures.
-    result[] = aggregateSignatures(sigs)
-
-#Set Aggregation Info.
-func setAggregationInfo*(sig: Signature, agInfo: AggregationInfo) =
-    sig[].cSetAggregationInfo(agInfo[])
-
-func `==`*(lhs: Signature, rhs: Signature): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) == cast[int](rhs)
-
-    result = lhs[] == rhs[]
-
-func `!=`*(lhs: Signature, rhs: Signature): bool =
-    if lhs.isNil or rhs.isNil:
-        return cast[int](lhs) != cast[int](rhs)
-
-    result = lhs[] != rhs[]
-
-#Verify.
-func verify*(sig: Signature): bool =
-    sig[].cVerify()
-
-#Stringify a Signature.
-func toString*(sig: Signature): string =
-    #Create the result string.
-    result = newString(96)
-
-    #Check if the Signature is null.
-    if sig.isNil:
+    #Set infinite and return if infinite.
+    if inf:
+        inf(addr result.value)
         return
 
-    #Serialize the sig into the string.
-    sig[].serialize(cast[ptr uint8](addr result[0]))
+    #Extract x.
+    var x: Big384
+    x.loadBytes(sig, cint(G1_LEN))
 
-#Stringify a Signature for printing.
-func `$`*(sig: Signature): string =
-    #Create the result string.
-    result = ""
+    #Calculate both Ys.
+    var
+        y1: Big384
+        y2: Big384
+    doAssert((addr result.value).setx(x, cint(0)) == 1)
+    doAssert(extract(x, y1, addr result.value) != -1)
+    doAssert((addr result.value).setx(x, cint(1)) == 1)
+    doAssert(extract(x, y2, addr result.value) != -1)
 
-    #Get the binary version of the string.
-    var serialized: string = sig.toString()
+    #Use the correct Y.
+    if (cmp(y2, y1) == 1) != greaterY:
+        doAssert(setx(addr result.value, x, cint(0)) == 1)
 
-    #Format the serialized string into a hex string.
-    for i in serialized:
-        result &= uint8(i).toHex()
+#Check if a Signature is infinite.
+proc isInf*(
+    sigArg: Signature
+): bool {.raises: [].} =
+    var sig: G1 = sigArg.value
+    return (addr sig).isInf == 1
+
+#Aggregate Signatures.
+proc aggregate*(
+    sigsArg: seq[Signature]
+): Signature {.raises: [].} =
+    if sigsArg.len == 0:
+        inf(addr result.value)
+        return
+
+    result.value = sigsArg[0].value
+    var sigs: seq[Signature] = sigsArg
+    for s in 1 ..< sigs.len:
+        if sigs[s].isInf:
+            inf(addr result.value)
+            return
+
+        add(addr result.value, addr sigs[s].value)
+
+#Sign a message.
+proc sign*(
+    key: PrivateKey,
+    msg: string
+): Signature {.raises: [].} =
+    result.value = msgToG(msg)
+    (addr result.value).mul(key.value)
+
+#Verify a Signature with the passed in AggregationInfo.
+proc verify*(
+    sigArg: Signature,
+    agInfoArg: AggregationInfo
+): bool {.raises: [].} =
+    if sigArg.isInf:
+        return false
+
+    var
+        sig: G1 = sigArg.value
+        agInfo: FP12 = agInfoArg.value
+        generator: G2
+        sigPairing: FP12
+    newGenerator(addr generator)
+
+    neg(addr sig)
+    pair(addr sigPairing, addr generator, addr sig)
+    merge(addr sigPairing, addr agInfo)
+    finalize(addr sigPairing)
+
+    return unity(addr sigPairing) == 1
+
+#Serialize a Signature as defined by the ZCash/Ethereum standards.
+proc serialize*(
+    sigArg: Signature
+): string {.raises: [].} =
+    var
+        sig: Signature = sigArg
+        x: Big384
+        y: Big384
+        yNeg: Big384
+    result = newString(G1_LEN)
+
+    #If the point is infinite, set the compressed/infinite flags and return.
+    if extract(x, y, addr sig.value) == -1:
+        result[0] = char(uint8(result[0]) or C_FLAG)
+        result[0] = char(uint8(result[0]) or B_FLAG)
+        return
+
+    #Serialize the X value and set the compressed flag.
+    result.saveBytes(x)
+    result[0] = char(uint8(result[0]) or C_FLAG)
+
+    #Negate the Y to find out if this is the larger or smaller Y.
+    (addr sig.value.y).neg(addr sig.value.y)
+    doAssert(extract(x, yNeg, addr sig.value) != -1)
+
+    #If this is the larger Y, set the flag.
+    if cmp(y, yNeg) == 1:
+        result[0] = char(uint8(result[0]) or A_FLAG)
