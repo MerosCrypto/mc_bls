@@ -18,22 +18,22 @@ installFiles = @[
 requires "nim > 1.0.0"
 
 after install:
-    let gitExe = system.findExe("git")
+    let gitExe: string = system.findExe("git")
     if gitExe == "":
-        echo "failed to find git!"
-        quit(1)
+        echo "Failed to find git."
+        quit(-1)
 
-    let cmakeExe = system.findExe("cmake")
+    let cmakeExe: string = system.findExe("cmake")
     if cmakeExe == "":
-        echo "failed to find cmake!"
-        quit(1)
+        echo "Failed to find CMake."
+        quit(-1)
 
-    let makeExe = system.findExe("make")
+    let makeExe: string = system.findExe("make")
     if makeExe == "":
-        echo "failed to find make!"
-        quit(1)
+        echo "Failed to find Make!"
+        quit(-1)
 
-    let milagroDir = projectDir() / "incubator-milagro-crypto-c"
+    let milagroDir: string = projectDir() / "incubator-milagro-crypto-c"
     rmDir milagroDir
     exec gitExe & " clone " & " https://github.com/apache/incubator-milagro-crypto-c " & milagroDir
 
