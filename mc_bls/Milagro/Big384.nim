@@ -9,17 +9,12 @@ type
 
 {.pop.}
 
-#Number to mod everything by.
-var Q* {.importc: "Modulus_BLS381".}: ConstBig384
+#Number to mod the Private Key by.
+var R* {.importc: "CURVE_Order_BLS381".}: ConstBig384
 
 {.push header: "big_384_58.h".}
 
 #Copy one Big384 to another.
-proc copy*(
-    res: Big384,
-    value: Big384
-) {.importc: "BIG_384_58_copy".}
-
 proc copy*(
     res: Big384,
     value: ConstBig384
@@ -28,9 +23,8 @@ proc copy*(
 #Mod one Big384 by another.
 proc `mod`*(
     res: Big384,
-    value: DBig384,
     modulus: Big384
-) {.importc: "BIG_384_58_dmod".}
+) {.importc: "BIG_384_58_mod".}
 
 #Compare two Big384s.
 #Returns 1 for a > b, -1 for a < b, and 0 for a == b.
@@ -50,11 +44,5 @@ proc loadBytes*(
     bytes: cstring,
     len: cint
 ) {.importc: "BIG_384_58_fromBytesLen".}
-
-proc loadBytes*(
-    res: DBig384,
-    bytes: cstring,
-    len: cint
-) {.importc: "BIG_384_58_dfromBytesLen".}
 
 {.pop.}

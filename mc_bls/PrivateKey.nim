@@ -10,19 +10,17 @@ type PrivateKey* = object
 
 #PrivateKey constructor.
 proc newPrivateKey*(
-    keyArg: string
+    key: string
 ): PrivateKey {.raises: [
     BLSError
 ].} =
-    if keyArg.len != G1_LEN:
+    if key.len != G1_LEN:
         raise newException(BLSError, "Invalid Private Key length.")
 
-    var
-        key: DBig384
-        q: Big384
-    key.loadBytes(keyArg, cint(G1_LEN))
-    q.copy(Q)
-    result.value.mod(key, q)
+    var r: Big384
+    result.value.loadBytes(key, cint(G1_LEN))
+    r.copy(R)
+    result.value.mod(r)
 
 #Serialize a Private Key.
 proc serialize*(

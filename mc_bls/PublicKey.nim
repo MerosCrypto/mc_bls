@@ -48,22 +48,18 @@ proc newPublicKey*(
         inf(addr result.value)
         return
 
-    #Extract x.
+    #Load x.
     var
         a: Big384
         b: Big384
         x: FP2
     a.loadBytes(addr key[0], cint(G1_LEN))
     b.loadBytes(addr key[G1_LEN], cint(G1_LEN))
-
-    copyMem(addr x.a.g, addr a, sizeof(Big384))
-    x.a.XES = 1
-    copyMem(addr x.b.g, addr b, sizeof(Big384))
-    x.b.XES = 1
+    (addr x).fromBigs(b, a)
 
     #Set x.
     if (addr result.value).setx(addr x) == 0:
-        raise newException(BLSError, "Infinite G2 didn't have the infinite flag set.")
+        raise newException(BLSError, "Invalid G2.")
 
     #Calculate both Ys.
     var
@@ -72,12 +68,12 @@ proc newPublicKey*(
     (addr yNeg).neg(addr result.value.y)
 
     #Compare the Ys.
-    copy(a, result.value.y.b.g)
-    copy(b, yNeg.b.g)
+    redc(a, addr result.value.y.b)
+    redc(b, addr yNeg.b)
     cmpRes = cmp(a, b)
     if cmpRes == 0:
-        a.copy(result.value.y.a.g)
-        b.copy(yNeg.a.g)
+        redc(a, addr result.value.y.a)
+        redc(b, addr yNeg.a)
         cmpRes = cmp(a, b)
 
     #Use the correct Y.
@@ -122,6 +118,8 @@ proc serialize*(
         key: PublicKey = keyArg
         x: FP2
         y: FP2
+        a: Big384
+        b: Big384
     result = newString(G2_LEN)
 
     #If the point is infinite, set the compressed/infinite flags and return.
@@ -130,19 +128,13 @@ proc serialize*(
         result[0] = char(uint8(result[0]) or B_FLAG)
         return
 
-    #Reduce X and Y.
-    reduce(addr x)
-    reduce(addr y)
-
-    var
-        a: Big384
-        b: Big384
-    a.copy(x.a.g)
-    b.copy(x.b.g)
+    #Reduce and store X.
+    redc(a, addr x.a)
+    redc(b, addr x.b)
 
     #Serialize the X values and set the compressed flag.
-    result.saveBytes(a)
-    (addr result[G1_LEN]).saveBytes(b)
+    (addr result[G1_LEN]).saveBytes(a)
+    (addr result[0]).saveBytes(b)
     result[0] = char(uint8(result[0]) or C_FLAG)
 
     #Negate the Y to find out if this is the larger or smaller Y.
@@ -152,12 +144,12 @@ proc serialize*(
     (addr yNeg).neg(addr y)
 
     #Compare the Ys.
-    copy(a, y.b.g)
-    copy(b, yNeg.b.g)
+    redc(a, addr y.b)
+    redc(b, addr yNeg.b)
     cmpRes = cmp(a, b)
     if cmpRes == 0:
-        a.copy(y.a.g)
-        b.copy(yNeg.a.g)
+        redc(a, addr y.a)
+        redc(b, addr yNeg.a)
         cmpRes = cmp(a, b)
 
     #If this is the larger Y, set the flag.

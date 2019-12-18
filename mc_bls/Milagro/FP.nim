@@ -17,6 +17,12 @@ proc neg*(
     src: ptr FP1
 ) {.importc: "FP_BLS381_neg", header: "fp_BLS381.h".}
 
+#Reduce and store a FP.
+proc redc*(
+    big: Big384,
+    fp: ptr FP1
+) {.importc: "FP_BLS381_redc".}
+
 {.push header: "fp2_BLS381.h".}
 
 #Negate a FP2.
@@ -29,5 +35,12 @@ proc neg*(
 proc reduce*(
     fp: ptr FP2
 ) {.importc: "FP2_BLS381_reduce".}
+
+#Load a FP2 from Big384s.
+proc fromBigs*(
+    fp: ptr FP2,
+    x1: Big384,
+    x2: Big384
+) {.importc: "FP2_BLS381_from_BIGs".}
 
 {.pop.}

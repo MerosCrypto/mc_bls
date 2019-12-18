@@ -1,6 +1,6 @@
 import os
 
-version     = "2.0.5"
+version     = "2.0.6"
 author      = "Luke Parker"
 description = "A Nim Wrapper for Milagro."
 license     = "MIT"
