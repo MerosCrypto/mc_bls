@@ -1,6 +1,6 @@
 import os
 
-version     = "2.0.6"
+version     = "2.0.7"
 author      = "Luke Parker"
 description = "A Nim Wrapper for Milagro."
 license     = "MIT"
@@ -21,17 +21,17 @@ after install:
     let gitExe: string = system.findExe("git")
     if gitExe == "":
         echo "Failed to find git."
-        quit(-1)
+        quit(1)
 
     let cmakeExe: string = system.findExe("cmake")
     if cmakeExe == "":
         echo "Failed to find CMake."
-        quit(-1)
+        quit(1)
 
     let makeExe: string = system.findExe("make")
     if makeExe == "":
         echo "Failed to find Make!"
-        quit(-1)
+        quit(1)
 
     let milagroDir: string = projectDir() / "incubator-milagro-crypto-c"
     rmDir milagroDir
