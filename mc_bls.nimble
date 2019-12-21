@@ -20,17 +20,17 @@ requires "nim > 1.0.0"
 after install:
     let gitExe: string = system.findExe("git")
     if gitExe == "":
-        echo "Failed to find git."
+        echo "Failed to find executable `git`."
         quit(1)
 
     let cmakeExe: string = system.findExe("cmake")
     if cmakeExe == "":
-        echo "Failed to find CMake."
+        echo "Failed to find executable `cmake`."
         quit(1)
 
     let makeExe: string = system.findExe("make")
     if makeExe == "":
-        echo "Failed to find Make!"
+        echo "Failed to find executable `make`."
         quit(1)
 
     let milagroDir: string = projectDir() / "incubator-milagro-crypto-c"
