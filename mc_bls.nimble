@@ -6,18 +6,17 @@ description = "A Nim Wrapper for Milagro."
 license     = "MIT"
 
 installDirs = @[
-    "mc_bls"
+    "mc_bls",
+    "incubator-milagro-crypto-c"
 ]
 
 installFiles = @[
-    "LICENSE",
-    "mc_bls.nim",
-    "README.md"
+    "mc_bls.nim"
 ]
 
 requires "nim > 1.0.0"
 
-after install:
+before install:
     let gitExe: string = system.findExe("git")
     if gitExe == "":
         echo "Failed to find executable `git`."
