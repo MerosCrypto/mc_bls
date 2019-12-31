@@ -56,7 +56,8 @@ proc newSignature*(
     var
         y1: Big384
         y2: Big384
-    doAssert((addr result.value).setx(x, cint(0)) == 1)
+    if (addr result.value).setx(x, cint(0)) != 1:
+        raise newException(BLSError, "Invalid BLS signature.")
     doAssert(extract(x, y1, addr result.value) != -1)
     doAssert((addr result.value).setx(x, cint(1)) == 1)
     doAssert(extract(x, y2, addr result.value) != -1)
