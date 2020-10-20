@@ -1,48 +1,44 @@
-#Aggregation Info library.
+import BLST
+import common
 
-import Milagro/G
-import Milagro/HashToG
-import Milagro/Pairing
+type AggregationInfo* = FP12
 
-import Common
-import PublicKey
-
-type AggregationInfo* = object
-    value*: FP12
-
-#AggregationInfo constructors.
 proc newAggregationInfo*(
-    keyArg: PublicKey,
-    msgArg: string
+  key: G2,
+  msg: string,
+  dst: string
 ): AggregationInfo {.raises: [
-    BLSError
+  BLSError
 ].} =
-    if keyArg.isInf:
-        raise newException(BLSError, "Infinite Public Key passed to newAggregationInfo.")
+  if (unsafeAddr key).isInf():
+    raise newException(BLSError, "Infinite Public Key passed to newAggregationInfo.")
 
-    var
-        key: PublicKey = keyArg
-        msg: G1 = msgToG(msgArg)
-    pair(addr result.value, addr key.value, addr msg)
+  var
+    msgPoint: G1
+    affineKey: G2Affine
+    affineMsg: G1Affine
+  hashToCurve(
+    unsafeAddr msgPoint,
+    nilIfEmpty(msg),
+    csize_t(msg.len),
+    nilIfEmpty(dst),
+    csize_t(dst.len),
+    nil,
+    0
+  )
+  toAffine(addr affineKey, unsafeAddr key)
+  toAffine(addr affineMsg, addr msgPoint)
 
-proc newAggregationInfo*(
-    keys: seq[PublicKey],
-    msg: string
-): AggregationInfo {.inline, raises: [
-    BLSError
-].} =
-    newAggregationInfo(keys.aggregate(), msg)
+  pair(addr result, unsafeAddr affineKey, addr affineMsg)
 
-#Aggregate Aggregation Infos.
 proc aggregate*(
-    agInfosArg: seq[AggregationInfo]
+  agInfos: seq[AggregationInfo]
 ): AggregationInfo {.raises: [
-    BLSError
+  BLSError
 ].} =
-    if agInfosArg.len == 0:
-        raise newException(BLSError, "No Aggregation Infos passed to aggregate.")
+  if agInfos.len == 0:
+    raise newException(BLSError, "No Aggregation Infos passed to aggregate.")
 
-    var agInfos: seq[AggregationInfo] = agInfosArg
-    for i in 1 ..< agInfos.len:
-        (addr agInfos[0].value).mul(addr agInfos[i].value)
-    return agInfos[0]
+  result = agInfos[0]
+  for i in 1 ..< agInfos.len:
+    mul(addr result, addr result, unsafeAddr agInfos[i])
