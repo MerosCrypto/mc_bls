@@ -1,2 +1,2 @@
-incubator-milagro-crypto-c/*
-!incubator-milagro-crypto-c/.folder
+blst/*
+!blst/.folder

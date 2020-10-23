@@ -1,30 +1,19 @@
-#Private Key library.
+import common
+import BLST
 
-import Common
+type PrivateKey* = Scalar
 
-import Milagro/Big384
-import Milagro/G
-
-type PrivateKey* = object
-    value*: Big384
-
-#PrivateKey constructor.
 proc newPrivateKey*(
-    key: string
+  key: string
 ): PrivateKey {.raises: [
-    BLSError
+  BLSError
 ].} =
-    if key.len != G1_LEN:
-        raise newException(BLSError, "Invalid Private Key length.")
+  if key.len != SCALAR_LEN:
+    raise newException(BLSError, "Invalid Private Key length.")
+  parse(addr result, unsafeAddr key[0])
 
-    var r: Big384
-    result.value.loadBytes(key, cint(G1_LEN))
-    r.copy(R)
-    result.value.mod(r)
-
-#Serialize a Private Key.
 proc serialize*(
-    key: PrivateKey
+  key: PrivateKey
 ): string {.raises: [].} =
-    result = newString(G1_LEN)
-    result.saveBytes(key.value)
+  result = newString(SCALAR_LEN)
+  serialize(addr result[0], unsafeAddr key)
