@@ -1,6 +1,6 @@
 import os
 
-version   = "3.0.0"
+version   = "3.0.1"
 author    = "Luke Parker"
 description = "A Nim Wrapper for blst."
 license   = "MIT"
@@ -15,6 +15,7 @@ installFiles = @[
 ]
 
 requires "nim > 1.0.0"
+requires "stint"
 
 before install:
   let gitExe: string = system.findExe("git")
@@ -27,9 +28,5 @@ before install:
     echo "Failed to find executable `make`."
     quit(1)
 
-  let blstDir: string = projectDir() / "blst"
-  rmDir blstDir
-  exec gitExe & " clone " & " https://github.com/supranational/blst " & blstDir
-
-  withDir blstDir / "build":
-    exec $(projectDir() / "blst" / "build.sh")
+  withDir thisDir() / "blst" / "build":
+    exec $(thisDir() / "blst" / "build.sh")

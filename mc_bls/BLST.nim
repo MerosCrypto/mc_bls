@@ -154,6 +154,10 @@ proc parse*(
   x: ptr ByteLike
 ): cint {.importc: "blst_p2_uncompress".}
 
+proc inGroup*(
+  p: ptr G2Affine
+): bool {.importc: "blst_p2_affine_in_g2".}
+
 {.pop.}
 
 proc inf*(

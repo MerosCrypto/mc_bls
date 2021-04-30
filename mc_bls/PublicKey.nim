@@ -12,7 +12,7 @@ proc newPublicKey*(
     raise newException(BLSError, "Invalid Public Key length.")
 
   var affine: G2Affine
-  if parse(addr affine, unsafeAddr key[0]) != 0:
+  if (parse(addr affine, unsafeAddr key[0]) != 0) or (not (addr affine).inGroup):
     raise newException(BLSError, "Invalid Public Key.")
   fromAffine(addr result, addr affine)
 

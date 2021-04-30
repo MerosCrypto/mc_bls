@@ -6,7 +6,6 @@ import times
 randomize(getTime().toUnix())
 
 import ../mc_bls
-import common
 
 #Create a buffer for the seed.
 var seed: string = newString(SCALAR_LEN)

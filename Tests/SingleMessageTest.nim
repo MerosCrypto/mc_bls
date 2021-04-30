@@ -36,6 +36,9 @@ for i in 0 ..< 1000:
   #Make sure the Signature is verifiable.
   assert(sig.verify(newAggregationInfo(pubKey, msg)))
 
+  #Sanity check not any AggregationInfo will pass as true.
+  assert(not sig.verify(newAggregationInfo(pubKey, msg & "0")))
+
   #Make sure the Signature doesn't verify against a different message.
   if uint8(msg[0]) == 255:
     msg[0] = char(0)
