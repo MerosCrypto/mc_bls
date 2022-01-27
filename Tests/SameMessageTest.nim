@@ -15,7 +15,7 @@ for i in 0 ..< 1000:
     msg[c] = char(rand(255))
 
   var
-    seed: string = newString(SCALAR_LEN)
+    seed: string = newString(SCALAR_LEN * 2)
     privKeys: seq[PrivateKey] = newSeq[PrivateKey](rand(100) + 2)
     pubKeys: seq[PublicKey] = newSeq[PublicKey](privKeys.len)
     sigs: seq[Signature] = newSeq[Signature](privKeys.len)

@@ -18,6 +18,19 @@ for i in 0 ..< 1000:
   var privKey: PrivateKey = newPrivateKey(seed)
 
   #Make sure serialization is consistent.
-  assert(privKey.serialize() == privKey.serialize())
+  assert privKey.serialize() == privKey.serialize()
+
+  if i == 500:
+    seed.setLen(SCALAR_LEN * 2)
+
+#Validate reduction.
+var
+  one_32: string
+  one_64: string
+one_32.setLen(32)
+one_64.setLen(64)
+one_32[31] = '\1'
+one_64[63] = '\1'
+assert newPrivateKey(one_32).serialize() == newPrivateKey(one_64).serialize()
 
 echo "Finished the Private Key Test."

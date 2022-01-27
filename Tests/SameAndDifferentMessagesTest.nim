@@ -13,7 +13,7 @@ import common
 for i in 0 ..< 1000:
   var
     msgs: seq[string] = newSeq[string](rand(100) + 2)
-    seed: string = newString(SCALAR_LEN)
+    seed: string = newString(SCALAR_LEN * 2)
     privKeys: seq[seq[PrivateKey]] = newSeq[seq[PrivateKey]](msgs.len)
     pubKeys: seq[seq[PublicKey]] = newSeq[seq[PublicKey]](msgs.len)
     sigs: seq[Signature] = newSeq[Signature](msgs.len)

@@ -8,7 +8,7 @@ randomize(getTime().toUnix())
 import ../mc_bls
 
 #Create a buffer for the seed.
-var seed: string = newString(SCALAR_LEN)
+var seed: string = newString(SCALAR_LEN * 2)
 for i in 0 ..< 1000:
   #Randomize the seed.
   for c in 0 ..< seed.len:
